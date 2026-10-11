@@ -580,7 +580,8 @@ body.light-mode {
         currentUser = val;
         document.getElementById('account-modal').classList.add('hidden');
 
-        if(val.toLowerCase() === 'creative player' || val.toLowerCase() === 'at') {
+        let lowerVal = val.toLowerCase();
+        if(lowerVal === 'creative player' || lowerVal === 'at') {
             startColorTest();
         } else {
             triggerFallbackRegistration();
@@ -714,9 +715,13 @@ body.light-mode {
             if(rkt) rkt.style.left = rocketX + 'px';
         };
 
-        document.getElementById('t-left').onclick = () => { if(!isGameOver) { rocketX = Math.max(0, rocketX - 25); let rkt = document.getElementById('rocket'); if(rkt) rkt.style.left = rocketX + 'px'; } };
-        document.getElementById('t-right').onclick = () => { if(!isGameOver) { rocketX = Math.min(560, rocketX + 25); let rkt = document.getElementById('rocket'); if(rkt) rkt.style.left = rocketX + 'px'; } };
-        document.getElementById('t-attack').onclick = () => {};
+        let leftBtn = document.getElementById('t-left');
+        let rightBtn = document.getElementById('t-right');
+        let attackBtn = document.getElementById('t-attack');
+
+        leftBtn.onclick = () => { if(!isGameOver) { rocketX = Math.max(0, rocketX - 25); let rkt = document.getElementById('rocket'); if(rkt) rkt.style.left = rocketX + 'px'; } };
+        rightBtn.onclick = () => { if(!isGameOver) { rocketX = Math.min(560, rocketX + 25); let rkt = document.getElementById('rocket'); if(rkt) rkt.style.left = rocketX + 'px'; } };
+        attackBtn.onclick = () => {};
 
         gameInterval = setInterval(() => {
             if(isGameOver) return;
@@ -797,9 +802,13 @@ body.light-mode {
             if(ply) ply.style.left = pX + 'px';
         };
 
-        document.getElementById('t-left').onclick = () => { pX = Math.max(0, pX - 15); let ply = document.getElementById('player'); if(ply) ply.style.left = pX + 'px'; };
-        document.getElementById('t-right').onclick = () => { pX = Math.min(250, pX + 15); let ply = document.getElementById('player'); if(ply) ply.style.left = pX + 'px'; };
-        document.getElementById('t-attack').onclick = () => {
+        let leftBtn = document.getElementById('t-left');
+        let rightBtn = document.getElementById('t-right');
+        let attackBtn = document.getElementById('t-attack');
+
+        leftBtn.onclick = () => { pX = Math.max(0, pX - 15); let ply = document.getElementById('player'); if(ply) ply.style.left = pX + 'px'; };
+        rightBtn.onclick = () => { pX = Math.min(250, pX + 15); let ply = document.getElementById('player'); if(ply) ply.style.left = pX + 'px'; };
+        attackBtn.onclick = () => {
             if(Math.abs(pX - bX) < 80) {
                 bHP = Math.max(0, bHP - 15);
                 let bhpElem = document.getElementById('b-hp');
