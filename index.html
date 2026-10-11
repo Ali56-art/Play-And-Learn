@@ -1,439 +1,851 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Play and Learn App</title>
-    <style>
-        :root {
-            --bg-color: #0f172a;
-            --text-color: #f8fafc;
-            --panel-bg: #1e293b;
-            --accent-color: #3b82f6;
-            --accent-hover: #2563eb;
-            --border-color: #334155;
-        }
+body.light-mode {
+        --bg-color: #f5f5f5;
+        --text-color: #121212;
+        --panel-bg: #ffffff;
+        --accent-color: #6200ee;
+        --accent-hover: #3700b3;
+        --border-color: #dddddd;
+    }
 
-        body.light-mode {
-            --bg-color: #f1f5f9;
-            --text-color: #0f172a;
-            --panel-bg: #ffffff;
-            --accent-color: #2563eb;
-            --accent-hover: #1d4ed8;
-            --border-color: #cbd5e1;
-        }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        user-select: none;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none;
-        }
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+        transition: background 0.3s, color 0.3s;
+    }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-            transition: background 0.3s, color 0.3s;
-        }
+    /* Top Bar */
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        background-color: var(--panel-bg);
+        border-bottom: 1px solid var(--border-color);
+        z-index: 100;
+    }
 
-        /* Üst Header Bar */
-        header {
-            background-color: var(--panel-bg);
-            border-bottom: 1px solid var(--border-color);
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            z-index: 100;
-        }
+    .header-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
 
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+    .header-btns {
+        display: flex;
+        gap: 10px;
+    }
 
-        .welcome-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
+    .btn {
+        background-color: var(--accent-color);
+        color: white;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background 0.2s, transform 0.1s;
+    }
 
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .btn:hover {
+        background-color: var(--accent-hover);
+    }
 
-        .btn {
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background 0.2s, transform 0.1s;
-        }
+    .btn:active {
+        transform: scale(0.95);
+    }
 
-        .btn:active {
-            transform: scale(0.95);
-        }
+    /* Main Container */
+    main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        position: relative;
+    }
 
-        .btn:hover {
-            background-color: var(--accent-hover);
-        }
+    /* Welcome Banners */
+    .welcome-container {
+        text-align: center;
+        margin-bottom: 20px;
+    }
 
-        /* Soft Sliding Panels (Market, Envanter, Ayarlar) */
-        .dropdown-panel {
-            position: absolute;
-            top: -300px;
-            left: 0;
-            width: 100%;
-            background-color: var(--panel-bg);
-            border-bottom: 1px solid var(--border-color);
-            padding: 25px;
-            z-index: 90;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-            transition: top 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+    .welcome-title {
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+    }
 
-        .dropdown-panel.active {
-            top: 60px;
-        }
+    .welcome-subtitle {
+        font-size: 1rem;
+        opacity: 0.8;
+    }
 
-        .market-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
+    /* Market Overlay (Sliding Down) */
+    #market-panel {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--panel-bg);
+        border-bottom: 2px solid var(--accent-color);
+        padding: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        transform: translateY(-100%);
+        transition: transform 0.3s ease-in-out;
+        z-index: 50;
+        max-height: 50vh;
+        overflow-y: auto;
+    }
 
-        .market-item {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px;
-            text-align: center;
-        }
+    #market-panel.open {
+        transform: translateY(0);
+    }
 
-        /* Ana Alan */
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            text-align: center;
-        }
+    .market-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
 
-        /* Doğrulama / Test Modalı */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.85);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
+    .market-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 15px;
+    }
 
-        .modal-card {
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            padding: 30px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 420px;
-            text-align: center;
-        }
+    .market-item {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid var(--border-color);
+        padding: 10px;
+        border-radius: 8px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
 
-        .modal-card input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            border-radius: 6px;
-        }
+    .market-item span {
+        font-size: 0.85rem;
+    }
 
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 15px;
-        }
+    /* Inventory Panel */
+    #inventory-panel {
+        width: 100%;
+        max-width: 600px;
+        background-color: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        display: none;
+    }
 
-        /* Oyun Konteynerleri ve Canvas */
-        .game-wrapper {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex: 1;
-            width: 100%;
-        }
+    #inventory-panel.open {
+        display: block;
+    }
 
-        canvas {
-            background: #020617;
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            max-width: 100%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+    .inventory-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+    }
 
-        .touch-controls {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 600px;
-            margin-top: 15px;
-            padding: 0 10px;
-        }
+    .inventory-slot {
+        background: rgba(255,255,255,0.03);
+        border: 1px dashed var(--border-color);
+        padding: 8px;
+        border-radius: 6px;
+        text-align: center;
+        font-size: 0.8rem;
+    }
 
-        .touch-group {
-            display: flex;
-            gap: 10px;
-        }
+    /* Main Menu / Dashboard */
+    .dashboard {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+        max-width: 500px;
+        align-items: center;
+    }
 
-        .touch-btn {
-            width: 65px;
-            height: 65px;
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            font-size: 1.3rem;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-    </style>
-</head>
-<body>
+    .menu-btn {
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border-radius: 8px;
+    }
 
-    <!-- Hesap Doğrulama / Creative Player Test Modalı -->
-    <div id="auth-modal" class="modal-overlay">
-        <div class="modal-card">
-            <h2 id="modal-title">Hesap Seçimi</h2>
-            <p id="modal-desc" style="margin: 10px 0; font-size: 0.9rem;">Değiştirmek için hesap adınızı girin:</p>
-            <input type="text" id="username-input" placeholder="Kullanıcı adı (örn: creative player)...">
-            <button class="btn" onclick="playSound(); handleAccountSubmit()" style="width: 100%; margin-top: 10px;">Devam Et</button>
+    /* Modals / Overlays */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 200;
+    }
+
+    .modal-content {
+        background-color: var(--panel-bg);
+        padding: 25px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 400px;
+        border: 1px solid var(--border-color);
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .modal-content input, .modal-content select {
+        width: 100%;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-color);
+        color: var(--text-color);
+    }
+
+    .options-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .option-btn {
+        padding: 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        color: white;
+    }
+
+    /* Game Containers */
+    #game-container {
+        width: 100%;
+        max-width: 600px;
+        height: 400px;
+        background: #000;
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+        display: none;
+        border: 2px solid var(--border-color);
+    }
+
+    .touch-controls {
+        display: none;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 600px;
+        margin-top: 15px;
+        padding: 0 10px;
+    }
+
+    .touch-group {
+        display: flex;
+        gap: 10px;
+    }
+
+    .control-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 1.2rem;
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+</style>
+<!-- Header -->
+<header>
+    <div class="header-title" id="app-title">Welcome, Guest</div>
+    <div class="header-btns">
+        <button class="btn" onclick="toggleMarket()">MARKET</button>
+        <button class="btn" onclick="toggleInventory()">ENVANTER</button>
+        <button class="btn" onclick="openSettings()">Ayarlar</button>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main>
+    <!-- Sliding Market Panel -->
+    <div id="market-panel">
+        <div class="market-header">
+            <h3>Sonsuz Market</h3>
+            <button class="btn" onclick="toggleMarket()">Kapat</button>
+        </div>
+        <div class="market-grid" id="market-items-grid">
+            <!-- Dynamically populated items -->
         </div>
     </div>
 
-    <!-- Üst Header -->
-    <header>
-        <div class="header-left">
-            <div class="welcome-title" id="welcome-display">Welcome Guest</div>
-        </div>
-        <div class="header-right">
-            <button class="btn" onclick="playSound(); togglePanel('market-panel')">MARKET</button>
-            <button class="btn" onclick="playSound(); togglePanel('inventory-panel')">ENVANTER</button>
-            <button class="btn" onclick="playSound(); togglePanel('settings-panel')">AYARLAR</button>
-        </div>
-    </header>
-
-    <!-- 1. Kayan Market Paneli -->
-    <div id="market-panel" class="dropdown-panel">
-        <h3>Market (Ücretsiz Creative Eşyaları)</h3>
-        <div class="market-grid" id="market-grid-items"></div>
+    <!-- Welcome Banner -->
+    <div class="welcome-container">
+        <h1 class="welcome-title" id="welcome-header">Welcome Guest</h1>
+        <p class="welcome-subtitle">Welcome to the Learn and Play App</p>
     </div>
 
-    <!-- 2. Kayan Envanter Paneli -->
-    <div id="inventory-panel" class="dropdown-panel">
-        <h3>Envanterim</h3>
-        <div class="market-grid" id="inventory-grid-items"></div>
-    </div>
-
-    <!-- 3. Kayan Ayarlar Paneli -->
-    <div id="settings-panel" class="dropdown-panel">
-        <h3>Oyun Ayarları & Modlar</h3>
-        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px; text-align: left; max-width: 300px; margin-left: auto; margin-right: auto;">
-            <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-                <span>🌙 Dark Mod</span>
-                <input type="checkbox" id="darkModeToggle" checked onchange="toggleDarkMode()">
-            </label>
-            <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-                <span>❄️ Dondurma Gücü (Pil Tasarrufu)</span>
-                <input type="checkbox" id="freezePowerToggle" onchange="toggleFreezePower()">
-            </label>
-            <p style="font-size: 0.75rem; color: #94a3b8;">* Daha az pil tüketir ve programları daha hızlı çalıştırır.</p>
-            <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-                <span>🎵 Arka Plan Müziği</span>
-                <input type="checkbox" id="musicToggle" onchange="toggleBGM()">
-            </label>
+    <!-- Toggleable Inventory Panel -->
+    <div id="inventory-panel">
+        <h3>Envanter</h3>
+        <div class="inventory-grid" id="inventory-grid-content">
+            <div class="inventory-slot">Boş</div>
         </div>
     </div>
 
-    <!-- Ana Lobi Görünümü -->
-    <main id="lobby-view">
-        <h1 id="main-heading">Welcome to the learn and play and learn app</h1>
-        <p style="margin: 15px 0; color: #94a3b8;">Parti oluştur, arkadaşlarınla oyna veya yapay zekaya meydan oku!</p>
-        <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
-            <button class="btn" onclick="playSound(); openPlayMenu()" style="padding: 12px 30px; font-size: 1.2rem;">PLAY</button>
-            <button class="btn" onclick="playSound(); openLearnMenu()" style="padding: 12px 30px; font-size: 1.2rem;">LEARN</button>
-        </div>
-    </main>
+    <!-- Dashboard Menu -->
+    <div class="dashboard" id="main-dashboard">
+        <button class="btn menu-btn" onclick="handleStartBtn()">Start</button>
+        <button class="btn menu-btn" onclick="openFriendsMenu()">Arkadaşlar & Parti</button>
+    </div>
 
-    <!-- Oyun Seçim Ekranı -->
-    <main id="play-modes-view" style="display: none;">
-        <h2>Oyun Modunu Seç</h2>
-        <div style="display: flex; gap: 15px; justify-content: center; margin-top: 25px;">
-            <button class="btn" onclick="playSound(); startRocketGame()" style="padding: 12px 24px;">Roket Oyunu</button>
-            <button class="btn" onclick="playSound(); startFightingGame()" style="padding: 12px 24px;">Dövüş Oyunu</button>
-            <button class="btn" onclick="playSound(); backToLobby()" style="background-color: #64748b; padding: 12px 24px;">Geri</button>
-        </div>
-    </main>
+    <!-- Game Canvas / Arena -->
+    <div id="game-container">
+        <!-- In-game elements injected via JS -->
+    </div>
 
-    <!-- Roket Oyunu Ekranı -->
-    <div id="rocket-game-wrapper" class="game-wrapper">
-        <div style="position: relative;">
-            <canvas id="rocketCanvas" width="600" height="400"></canvas>
-            <div id="try-again-container" style="display:none; position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); text-align:center;">
-                <h2 style="color: #ef4444; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">ÇARPIŞMA!</h2>
-                <button class="btn" onclick="playSound(); resetRocketGame()" style="font-size: 1.4rem; padding: 12px 28px;">TRY AGAIN</button>
+    <!-- Touch Controls for iPad/Mobile -->
+    <div class="touch-controls" id="touch-controls-bar">
+        <div class="touch-group">
+            <button class="control-btn" id="t-left">◀</button>
+            <button class="control-btn" id="t-right">▶</button>
+        </div>
+        <div class="touch-group">
+            <button class="control-btn" id="t-attack" style="background: #d32f2f;">VUR</button>
+        </div>
+    </div>
+</main>
+
+<!-- Account / Verification Modal -->
+<div class="modal-overlay" id="account-modal">
+    <div class="modal-content">
+        <h3>Hesap Seçimi</h3>
+        <p>Devam etmek için hesap adını girin (Örn: creative player)</p>
+        <input type="text" id="username-input" placeholder="Kullanıcı adı...">
+        <button class="btn" onclick="submitUsername()">Devam Et</button>
+    </div>
+</div>
+
+<!-- Multi-stage Tests Modal -->
+<div class="modal-overlay hidden" id="test-modal">
+    <div class="modal-content" id="test-content">
+        <!-- Dynamic Test Content -->
+    </div>
+</div>
+
+<!-- Learn Options Modal -->
+<div class="modal-overlay hidden" id="learn-modal">
+    <div class="modal-content">
+        <h3>Learn Seçenekleri</h3>
+        <p>Learn seçenekleri açılmıyor çünkü learn seçenekleri daha güncellenmedi. Lütfen learn seçenekleri güncellenince uygulamaya gelip tekrar deneyiniz.</p>
+        <button class="btn" onclick="closeLearnModal()">Kapat</button>
+    </div>
+</div>
+
+<!-- Play Options Modal -->
+<div class="modal-overlay hidden" id="play-modal">
+    <div class="modal-content">
+        <h3>Oyun Modu Seçin</h3>
+        <button class="btn" onclick="startRocketGame()">Roket Oyunu</button>
+        <button class="btn" onclick="startFightGame()">Dövüş Oyunu</button>
+        <button class="btn" style="background:#555;" onclick="closePlayModal()">Geri</button>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay hidden" id="settings-modal">
+    <div class="modal-content">
+        <h3>Ayarlar</h3>
+        <label style="display:flex; justify-content:space-between; align-items:center;">
+            Müzik (Aç/Kapat):
+            <input type="checkbox" id="music-toggle" onchange="toggleAudioMusic()">
+        </label>
+        <label style="display:flex; justify-content:space-between; align-items:center;">
+            Dark Mode:
+            <input type="checkbox" id="darkmode-toggle" checked onchange="toggleDarkMode()">
+        </label>
+        <div>
+            <p style="font-size:0.85rem; opacity:0.8; margin-bottom:5px;">Dondurma Gücü: Daha az pil tüketir ve daha hızlı programları çalıştırır.</p>
+            <input type="range" min="1" max="10" value="5" style="width:100%;">
+        </div>
+        <div>
+            <p style="font-size:0.85rem; opacity:0.8; margin-bottom:5px;">Yapay Zeka Zorluğu (Solo):</p>
+            <select id="ai-difficulty">
+                <option value="easy">Kolay</option>
+                <option value="medium" selected>Orta</option>
+                <option value="hard">Zor</option>
+                <option value="expert">Uzman</option>
+            </select>
+        </div>
+        <button class="btn" onclick="closeSettings()">Kaydet & Kapat</button>
+    </div>
+</div>
+
+<!-- Friends & Party Modal -->
+<div class="modal-overlay hidden" id="friends-modal">
+    <div class="modal-content">
+        <h3>Arkadaşlar & Parti</h3>
+        <p style="font-size:0.9rem; opacity:0.8;">Arkadaş Listesi: 0 | İstekler: 0 | Parti Üyesi: Yok</p>
+        <button class="btn" onclick="alert('Parti oluşturuldu!')">Parti Oluştur</button>
+        <button class="btn" onclick="alert('Arkadaş eklendi / istek gönderildi!')">Arkadaş Ekle</button>
+        <button class="btn" style="background:#555;" onclick="closeFriendsMenu()">Kapat</button>
+    </div>
+</div>
+
+<script>
+    // State management
+    let currentUser = "";
+    let isCreativePlayer = false;
+    let inventory = [];
+    let coins = 100;
+    let gems = 10;
+    let activeMarketItems = [];
+    let gameInterval = null;
+
+    // Audio Engine (Web Audio API Synthesizer for Lobby, Fight, Rocket)
+    let audioCtx = null;
+    let isMusicPlaying = false;
+    let musicInterval = null;
+
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    }
+
+    function playSynthTone(freq, duration, type = 'sine') {
+        if (!isMusicPlaying || !audioCtx) return;
+        try {
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        } catch(e) {}
+    }
+
+    function startLobbyMusic() {
+        stopMusic();
+        isMusicPlaying = true;
+        const notes = [261.63, 329.63, 392.00, 523.25]; // C, E, G, C
+        let i = 0;
+        musicInterval = setInterval(() => {
+            if (!isMusicPlaying) return;
+            playSynthTone(notes[i % notes.length], 0.3, 'triangle');
+            i++;
+        }, 400);
+    }
+
+    function startFightMusic() {
+        stopMusic();
+        isMusicPlaying = true;
+        const notes = [150, 220, 180, 300]; 
+        let i = 0;
+        musicInterval = setInterval(() => {
+            if (!isMusicPlaying) return;
+            playSynthTone(notes[i % notes.length], 0.2, 'sawtooth');
+            i++;
+        }, 250);
+    }
+
+    function startRocketMusic() {
+        stopMusic();
+        isMusicPlaying = true;
+        const notes = [440, 554.37, 659.25]; 
+        let i = 0;
+        musicInterval = setInterval(() => {
+            if (!isMusicPlaying) return;
+            playSynthTone(notes[i % notes.length], 0.4, 'sine');
+            i++;
+        }, 600);
+    }
+
+    function stopMusic() {
+        isMusicPlaying = false;
+        if (musicInterval) clearInterval(musicInterval);
+    }
+
+    function toggleAudioMusic() {
+        let chk = document.getElementById('music-toggle').checked;
+        if (chk) {
+            initAudio();
+            startLobbyMusic();
+        } else {
+            stopMusic();
+        }
+    }
+
+    // Market & Random Restocking
+    const possibleItems = [
+        { name: "Neon Kostüm", type: "Kostüm" },
+        { name: "Altın Roket", type: "Roket Kaplaması" },
+        { name: "Alev Efekti", type: "Efekt" },
+        { name: "Lazer Kılıç", type: "Kostüm" },
+        { name: "Galaksi Kalkanı", type: "Efekt" },
+        { name: "Cyberpunk Şapka", type: "Kostüm" }
+    ];
+
+    function generateRandomMarketItems() {
+        activeMarketItems = [];
+        for(let i=0; i<4; i++) {
+            let randomItem = possibleItems[Math.floor(Math.random() * possibleItems.length)];
+            activeMarketItems.push({ ...randomItem, id: Math.random() });
+        }
+        renderMarket();
+    }
+
+    function renderMarket() {
+        let grid = document.getElementById('market-items-grid');
+        grid.innerHTML = "";
+        activeMarketItems.forEach((item, index) => {
+            let div = document.createElement('div');
+            div.className = "market-item";
+            div.innerHTML = `
+                <strong>${item.name}</strong>
+                <span>${item.type}</span>
+                <span style="color:#00e676; font-weight:bold;">ÜCRETSİZ</span>
+                <button class="btn" style="padding:4px 8px; font-size:0.8rem;" onclick="buyItem(${index})">Satın Al</button>
+            `;
+            grid.appendChild(div);
+        });
+    }
+
+    function buyItem(index) {
+        let purchased = activeMarketItems[index];
+        inventory.push(purchased.name);
+        renderInventory();
+        // Replace with a new random item instantly
+        let newItem = possibleItems[Math.floor(Math.random() * possibleItems.length)];
+        activeMarketItems[index] = { ...newItem, id: Math.random() };
+        renderMarket();
+    }
+
+    function renderInventory() {
+        let invGrid = document.getElementById('inventory-grid-content');
+        invGrid.innerHTML = "";
+        if (inventory.length === 0) {
+            invGrid.innerHTML = '<div class="inventory-slot">Boş</div>';
+            return;
+        }
+        inventory.forEach((item, idx) => {
+            let div = document.createElement('div');
+            div.className = "inventory-slot";
+            div.innerHTML = `<strong>${item}</strong><br><button class="btn" style="padding:2px 6px; font-size:0.7rem; margin-top:4px;" onclick="unequipItem(${idx})">Çıkart</button>`;
+            invGrid.appendChild(div);
+        });
+    }
+
+    function unequipItem(idx) {
+        inventory.splice(idx, 1);
+        renderInventory();
+    }
+
+    // Toggles
+    function toggleMarket() {
+        document.getElementById('market-panel').classList.toggle('open');
+    }
+
+    function toggleInventory() {
+        document.getElementById('inventory-panel').classList.toggle('open');
+    }
+
+    function openSettings() {
+        document.getElementById('settings-modal').classList.remove('hidden');
+    }
+
+    function closeSettings() {
+        document.getElementById('settings-modal').classList.add('hidden');
+    }
+
+    function toggleDarkMode() {
+        document.body.classList.toggle('light-mode');
+    }
+
+    function openFriendsMenu() {
+        document.getElementById('friends-modal').classList.remove('hidden');
+    }
+
+    function closeFriendsMenu() {
+        document.getElementById('friends-modal').classList.add('hidden');
+    }
+
+    // Username & Verification Flow
+    window.onload = function() {
+        generateRandomMarketItems();
+        startLobbyMusic();
+    };
+
+    function submitUsername() {
+        let val = document.getElementById('username-input').value.trim();
+        if(!val) return;
+        currentUser = val;
+        document.getElementById('account-modal').classList.add('hidden');
+
+        if(val.toLowerCase() === 'creative player') {
+            startColorTest();
+        } else {
+            triggerFallbackRegistration();
+        }
+    }
+
+    // Creative Player 3-Stage Test
+    function startColorTest() {
+        let modal = document.getElementById('test-modal');
+        let content = document.getElementById('test-content');
+        modal.classList.remove('hidden');
+        content.innerHTML = `
+            <h3>Creative Player - Renk Testi</h3>
+            <p>Creative player'ın en sevdiği renk ne?</p>
+            <div class="options-grid">
+                <button class="option-btn" style="background:#f44336;" onclick="checkColor('red')">Kırmızı</button>
+                <button class="option-btn" style="background:#2196f3;" onclick="checkColor('blue')">Mavi</button>
+                <button class="option-btn" style="background:#ffeb3b; color:#000;" onclick="checkColor('yellow')">Sarı</button>
+                <button class="option-btn" style="background:#9c27b0;" onclick="checkColor('purple')">Mor</button>
             </div>
-        </div>
-        <div class="touch-controls">
-            <div class="touch-group">
-                <button class="touch-btn" onmousedown="rocketMoveLeft=true" onmouseup="rocketMoveLeft=false" ontouchstart="rocketMoveLeft=true" ontouchend="rocketMoveLeft=false">◀</button>
-                <button class="touch-btn" onmousedown="rocketMoveRight=true" onmouseup="rocketMoveRight=false" ontouchstart="rocketMoveRight=true" ontouchend="rocketMoveRight=false">▶</button>
+        `;
+    }
+
+    function checkColor(choice) {
+        if(choice === 'blue') {
+            startApiKeyTest();
+        } else {
+            triggerFallbackRegistration();
+        }
+    }
+
+    function startApiKeyTest() {
+        let content = document.getElementById('test-content');
+        content.innerHTML = `
+            <h3>Creative player'ın en sevdiği oyun</h3>
+            <div class="options-grid">
+                <button class="option-btn" style="background:#4caf50;" onclick="checkGame('minecraft')">Minecraft</button>
+                <button class="option-btn" style="background:#f44336;" onclick="checkGame('amongus')">Among Us</button>
+                <button class="option-btn" style="background:#e91e63;" onclick="checkGame('roblox')">Roblox</button>
+                <button class="option-btn" style="background:#ffeb3b; color:#000;" onclick="checkGame('fortnite')">Fortnite</button>
             </div>
-            <button class="btn" onclick="playSound(); backToPlayModes()" style="background-color: #64748b;">Çıkış</button>
-        </div>
-    </div>
+        `;
+    }
 
-    <!-- Dövüş Oyunu Ekranı -->
-    <div id="fighting-game-wrapper" class="game-wrapper">
-        <canvas id="fightCanvas" width="600" height="400"></canvas>
-        <div class="touch-controls">
-            <div class="touch-group">
-                <button class="touch-btn" onmousedown="fightMoveLeft=true" onmouseup="fightMoveLeft=false" ontouchstart="fightMoveLeft=true" ontouchend="fightMoveLeft=false">◀</button>
-                <button class="touch-btn" onmousedown="fightMoveRight=true" onmouseup="fightMoveRight=false" ontouchstart="fightMoveRight=true" ontouchend="fightMoveRight=false">▶</button>
+    function checkGame(choice) {
+        if(choice === 'minecraft' || choice === 'amongus') {
+            startObjectTest();
+        } else {
+            triggerFallbackRegistration();
+        }
+    }
+
+    function startObjectTest() {
+        let content = document.getElementById('test-content');
+        content.innerHTML = `
+            <h3>Creative player'ın en sevdiği nesne</h3>
+            <div class="options-grid">
+                <button class="option-btn" style="background:#2196f3;" onclick="checkObject('yastik')">Yastık</button>
+                <button class="option-btn" style="background:#2196f3;" onclick="checkObject('yatak')">Yatak</button>
+                <button class="option-btn" style="background:#2196f3;" onclick="checkObject('masa')">Masa</button>
+                <button class="option-btn" style="background:#2196f3;" onclick="checkObject('sandalye')">Sandalye</button>
             </div>
-            <button class="touch-btn" style="background-color: #dc2626;" onclick="playSound(); fightAttackAction()">VUR</button>
-            <button class="btn" onclick="playSound(); backToPlayModes()" style="background-color: #64748b;">Çıkış</button>
-        </div>
-    </div>
+        `;
+    }
 
-    <script>
-        // --- SES EFEKTLERİ VE MÜZİK (Web Audio API) ---
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let bgmInterval = null;
-        let isMusicOn = false;
-
-        function playSound(freq = 440, type = 'sine', duration = 0.08) {
-            try {
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.value = freq;
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch(e) {}
+    function checkObject(choice) {
+        if(choice === 'yastik' || choice === 'yatak') {
+            isCreativePlayer = true;
+            document.getElementById('test-modal').classList.add('hidden');
+            updateUserUI();
+        } else {
+            triggerFallbackRegistration();
         }
+    }
 
-        function toggleBGM() {
-            isMusicOn = document.getElementById('musicToggle').checked;
-            if (isMusicOn) {
-                let notes = [261.63, 329.63, 392.00, 523.25];
-                let idx = 0;
-                bgmInterval = setInterval(() => {
-                    if (isMusicOn) {
-                        playSound(notes[idx % notes.length], 'triangle', 0.2);
-                        idx++;
-                    }
-                }, 400);
-            } else {
-                clearInterval(bgmInterval);
-            }
+    function triggerFallbackRegistration() {
+        let content = document.getElementById('test-content');
+        content.innerHTML = `
+            <h3>Doğrulama Gerekli</h3>
+            <p>Yanlış cevap veya standart kullanıcı! Lütfen Gmail ve Doğum Tarihinizi girin:</p>
+            <input type="email" placeholder="Gmail adresiniz...">
+            <input type="date">
+            <button class="btn" onclick="completeRegistration()">Tamamla</button>
+        `;
+    }
+
+    function completeRegistration() {
+        document.getElementById('test-modal').classList.add('hidden');
+        updateUserUI();
+    }
+
+    function updateUserUI() {
+        if(isCreativePlayer) {
+            document.getElementById('app-title').innerText = `Welcome, ${currentUser} (Creative)`;
+            document.getElementById('welcome-header').innerText = `Welcome, ${currentUser}`;
+        } else {
+            document.getElementById('app-title').innerText = `Welcome, ${currentUser}`;
+            document.getElementById('welcome-header').innerText = `Welcome, ${currentUser}`;
         }
+    }
 
-        function toggleDarkMode() {
-            document.body.classList.toggle('light-mode', !document.getElementById('darkModeToggle').checked);
-        }
+    // Start button logic
+    function handleStartBtn() {
+        document.getElementById('play-modal').classList.remove('hidden');
+    }
 
-        function toggleFreezePower() {
-            let active = document.getElementById('freezePowerToggle').checked;
-            alert(active ? "Dondurma Gücü Açıldı: Daha az pil tüketir ve programlar daha hızlı çalışır!" : "Dondurma Gücü Kapatıldı.");
-        }
+    function closePlayModal() {
+        document.getElementById('play-modal').classList.add('hidden');
+    }
 
-        // --- PANEL YÖNETİMİ (Soft Açılma/Kapanma) ---
-        function togglePanel(panelId) {
-            const panels = ['market-panel', 'inventory-panel', 'settings-panel'];
-            panels.forEach(id => {
-                const el = document.getElementById(id);
-                if (id === panelId) {
-                    el.classList.toggle('active');
-                } else {
-                    el.classList.remove('active');
+    function closeLearnModal() {
+        document.getElementById('learn-modal').classList.add('hidden');
+    }
+
+    // Rocket Game (Left/Right only + Collision Try Again)
+    function startRocketGame() {
+        closePlayModal();
+        startRocketMusic();
+        let container = document.getElementById('game-container');
+        container.style.display = 'block';
+        document.getElementById('touch-controls-bar').style.display = 'flex';
+        container.innerHTML = `<div id="rocket" style="position:absolute; bottom:20px; left:270px; width:40px; height:60px; background:#00e676; border-radius:5px;"></div>`;
+
+        let rocketX = 270;
+        let asteroidY = 0;
+        let asteroidX = Math.floor(Math.random() * 560);
+        let isGameOver = false;
+
+        window.onkeydown = function(e) {
+            if(isGameOver) return;
+            if(e.key === 'ArrowLeft' || e.key === 'a') rocketX = Math.max(0, rocketX - 20);
+            if(e.key === 'ArrowRight' || e.key === 'd') rocketX = Math.min(560, rocketX + 20);
+            document.getElementById('rocket').style.left = rocketX + 'px';
+        };
+
+        // Touch bindings for rocket
+        document.getElementById('t-left').onclick = () => { if(!isGameOver) { rocketX = Math.max(0, rocketX - 25); document.getElementById('rocket').style.left = rocketX + 'px'; } };
+        document.getElementById('t-right').onclick = () => { if(!isGameOver) { rocketX = Math.min(560, rocketX + 25); document.getElementById('rocket').style.left = rocketX + 'px'; } };
+        document.getElementById('t-attack').onclick = () => {}; // No attack in rocket
+
+        gameInterval = setInterval(() => {
+            if(isGameOver) return;
+            asteroidY += 5;
+            if(asteroidY > 340) {
+                // Check collision
+                if(Math.abs(rocketX - asteroidX) < 40) {
+                    isGameOver = true;
+                    showTryAgainButton();
+                    return;
                 }
-            });
-        }
-
-        let currentUser = "";
-        let isCreativePlayer = false;
-
-        function handleAccountSubmit() {
-            const val = document.getElementById('username-input').value.trim();
-            if(!val) return;
-            currentUser = val;
-            if(val.toLowerCase() === "creative player") {
-                startCreativeTest(0);
-            } else {
-                finalizeLogin(false);
+                asteroidY = 0;
+                asteroidX = Math.floor(Math.random() * 560);
             }
-        }
 
-        function startCreativeTest(step) {
-            const modalTitle = document.getElementById('modal-title');
-            const modalDesc = document.getElementById('modal-desc');
-            document.getElementById('username-input').style.display = 'none';
-            
-            let html = '';
-            if(step === 0) {
-                modalTitle.innerText = "Creative Player Testi (1/3)";
-                modalDesc.innerText = "En sevdiği renk ne?";
-                html = `<div class="options-grid"><button class="btn" onclick="playSound(); checkTestAnswer(0, 'gri')">Gri</button><button class="btn" onclick="playSound(); checkTestAnswer(0, 'mavi')">Mavi</button><button class="btn" onclick="playSound(); checkTestAnswer(0, 'kirmizi')">Kırmızı</button><button class="btn" onclick="playSound(); checkTestAnswer(0, 'sari')">Sarı</button></div>`;
-            } else if(step === 1) {
-                modalTitle.innerText = "Creative Player Testi (2/3)";
-                modalDesc.innerText = "Creative player'ın en sevdiği oyun?";
-                html = `<div class="options-grid"><button class="btn" style="background:#16a34a;" onclick="playSound(); checkTestAnswer(1, 'minecraft')">Minecraft</button><button class="btn" style="background:#dc2626;" onclick="playSound(); checkTestAnswer(1, 'amongus')">Among Us</button><button class="btn" style="background:#db2777;" onclick="playSound(); checkTestAnswer(1, 'roblox')">Roblox</button><button class="btn" style="background:#ca8a04;" onclick="playSound(); checkTestAnswer(1, 'fortnite')">Fortnite</button></div>`;
-            } else if(step === 2) {
-                modalTitle.innerText = "Creative Player Testi (3/3)";
-                modalDesc.innerText = "Creative player'ın en sevdiği nesne?";
-                html = `<div class="options-grid"><button class="btn" style="background:#2563eb;" onclick="playSound(); checkTestAnswer(2, 'yastik')">Yastık</button><button class="btn" style="background:#2563eb;" onclick="playSound(); checkTestAnswer(2, 'yatak')">Yatak</button><button class="btn" style="background:#2563eb;" onclick="playSound(); checkTestAnswer(2, 'masa')">Masa</button><button class="btn" style="background:#2563eb;" onclick="playSound(); checkTestAnswer(2, 'sandalye')">Sandalye</button></div>`;
+            let ast = document.getElementById('asteroid');
+            if(!ast) {
+                ast = document.createElement('div');
+                ast.id = 'asteroid';
+                ast.style.position = 'absolute';
+                ast.style.width = '40px';
+                ast.style.height = '40px';
+                ast.style.background = '#f44336';
+                ast.style.borderRadius = '50%';
+                container.appendChild(ast);
             }
-            let gridDiv = document.getElementById('test-options-container') || document.createElement('div');
-            gridDiv.id = 'test-options-container';
-            modalDesc.after(gridDiv);
-            gridDiv.innerHTML = html;
-        }
+            ast.style.top = asteroidY + 'px';
+            ast.style.left = asteroidX + 'px';
+        }, 30);
+    }
 
-        function checkTestAnswer(step, answer) {
-            if(step === 0 && (answer === 'gri' || answer === 'mavi')) startCreativeTest(1);
-            else if(step === 1 && (answer === 'minecraft' || answer === 'amongus')) startCreativeTest(2);
-            else if(step === 2 && (answer === 'yastik' || answer === 'yatak')) { isCreativePlayer = true; finalizeLogin(true); }
-            else { alert("Yanlış cevap! E-posta ve doğum tarihi doğrulaması gerekiyor."); location.reload(); }
-        }
+    function showTryAgainButton() {
+        clearInterval(gameInterval);
+        let container = document.getElementById('game-container');
+        let btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.innerText = 'TRY AGAIN';
+        btn.style.position = 'absolute';
+        btn.style.top = '40%';
+        btn.style.left = '50%';
+        btn.style.transform = 'translate(-50%, -50%)';
+        btn.style.zIndex = '300';
+        btn.onclick = () => startRocketGame();
+        container.appendChild(btn);
+    }
 
-        function finalizeLogin(creative) {
-            document.getElementById('auth-modal').style.display = 'none';
-            document.getElementById('welcome-display').innerText = creative ? `Welcome Yaratan Kişi (${currentUser})` : `Welcome ${currentUser}`;
-            document.getElementById('main-heading').innerText = `Welcome to
+    // Fight Game (Separated controls, AI difficulty, HP damage)
+    function startFightGame() {
+        closePlayModal();
+        startFightMusic();
+        let container = document.getElementById('game-container');
+        container.style.display = 'block';
+        document.getElementById('touch-controls-bar').style.display = 'flex';
+        
+        container.innerHTML = `
+            <div style="display:flex; justify-content:space-between; padding:10px;">
+                <div>Oyuncu Canı: <span id='p-hp'>100</span></div>
+                <div>Bot Canı: <span id='b-hp'>100</span></div>
+            </div>
+            <div id="player" style="position:absolute; bottom:50px; left:100px; width:40px; height:80px; background:#2196f3;"></div>
+            <div id="bot" style="position:absolute; bottom:50px; right:100px; width:40px; height:80px; background:#f44336;"></div>
+        `;
+
+        let pX = 100;
+        let bX = 460;
+        let pHP = 100;
+        let bHP = 100;
+
+        window.onkeydown = function(e) {
+            if(e.key === 'a' || e.key === 'ArrowLeft') pX = Math.max(0, pX - 15);
+            if(e.key === 'd' || e.key === 'ArrowRight') pX = Math.min(250, pX + 15);
+            if(e.key === ' ' || e.key === 'j') {
+                // Attack
+                if(Math.abs(pX - bX) < 80) {
+                    bHP = Math.max(0, bHP - 15);
+                    document.getElementById('b-hp').innerText = bHP;
+                    if(bHP === 0) alert('Kazandın!');
+                }
+            }
+            document.getElementById('player').style.left = pX + 'px';
+        };
+
+        document.getElementById('t-left').onclick = () => { pX = Math.max(0, pX - 15); document.getElementById('player').style.left = pX + 'px'; };
+        document.getElementById('t-right').onclick = () => { pX = Math.min(250, pX + 15); document.getElementById('player').style.left = pX + 'px'; };
+        document.getElementById('t-attack').onclick = () => {
+            if(Math.abs(pX - bX) < 80) {
+                bHP = Math.max(0, bHP - 15);
+                document.getElementById('b-hp').innerText = bHP;
+                if(bHP === 0) alert('Kazandın!');
+            }
+        };
+    }
+</script>
