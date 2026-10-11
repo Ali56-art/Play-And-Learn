@@ -188,10 +188,11 @@
         }
 
         canvas {
-            background: #000;
+            background: #020617;
             border: 2px solid var(--border-color);
             border-radius: 10px;
             max-width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         .touch-controls {
@@ -209,15 +210,16 @@
         }
 
         .touch-btn {
-            width: 60px;
-            height: 60px;
+            width: 65px;
+            height: 65px;
             background: var(--accent-color);
             color: white;
             border: none;
             border-radius: 50%;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: bold;
             cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
     </style>
 </head>
@@ -281,8 +283,9 @@
     <div id="rocket-game-wrapper" class="game-wrapper">
         <div style="position: relative;">
             <canvas id="rocketCanvas" width="600" height="400"></canvas>
-            <div id="try-again-container" style="display:none; position:absolute; top:40%; left:50%; transform:translate(-50%,-50%);">
-                <button class="btn" onclick="resetRocketGame()" style="font-size: 1.5rem; padding: 15px 30px;">TRY AGAIN</button>
+            <div id="try-again-container" style="display:none; position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); text-align:center;">
+                <h2 style="color: #ef4444; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">ÇARPIŞMA!</h2>
+                <button class="btn" onclick="resetRocketGame()" style="font-size: 1.4rem; padding: 12px 28px;">TRY AGAIN</button>
             </div>
         </div>
         <div class="touch-controls">
@@ -396,7 +399,7 @@
 
         function toggleMarket() { document.getElementById('market-panel').classList.toggle('active'); document.getElementById('inventory-panel').classList.remove('active'); }
         function toggleInventory() { document.getElementById('inventory-panel').classList.toggle('active'); document.getElementById('market-panel').classList.remove('active'); }
-        function openSettings() { alert("Ayarlar açık."); }
+        function openSettings() { alert("Ayarlar: Müzik ve Dondurma Gücü aktif."); }
         function openPlayMenu() { document.getElementById('lobby-view').style.display = 'none'; document.getElementById('play-modes-view').style.display = 'flex'; }
         function openLearnMenu() { alert("Learn seçenekleri henüz güncellenmedi. Lütfen learn seçenekleri güncellenince uygulamaya gelip tekrar deneyiniz."); }
         function backToLobby() { document.getElementById('play-modes-view').style.display = 'none'; document.getElementById('lobby-view').style.display = 'flex'; }
@@ -404,118 +407,163 @@
             document.getElementById('rocket-game-wrapper').style.display = 'none';
             document.getElementById('fighting-game-wrapper').style.display = 'none';
             document.getElementById('play-modes-view').style.display = 'flex';
-            window.cancelAnimationFrame(gameInterval);
+            cancelAnimationFrame(rocketAnimId);
+            cancelAnimationFrame(fightAnimId);
         }
 
-        // --- ROKET OYUNU MANTIĞI ---
-        let rocketCanvas, rocketCtx, rocketX, rocketY, rocketMoveLeft = false, rocketMoveRight = false, asteroids = [], rocketGameRunning = false, gameInterval;
-        
+        // --- ROKET OYUNU MOTORU ---
+        let rocketCanvas, rocketCtx, rocketX = 275, rocketMoveLeft = false, rocketMoveRight = false, asteroids = [], rocketRunning = false, rocketAnimId;
+
         function startRocketGame() {
             document.getElementById('play-modes-view').style.display = 'none';
             document.getElementById('rocket-game-wrapper').style.display = 'flex';
             document.getElementById('try-again-container').style.display = 'none';
             rocketCanvas = document.getElementById('rocketCanvas');
             rocketCtx = rocketCanvas.getContext('2d');
-            rocketX = 275; rocketY = 330;
-            asteroids = [{x: Math.random() * 550, y: -50, speed: 3}];
-            rocketGameRunning = true;
-            updateRocketGame();
+            rocketX = 275;
+            asteroids = [
+                {x: 100, y: -50, speed: 3},
+                {x: 300, y: -150, speed: 4},
+                {x: 450, y: -250, speed: 3.5}
+            ];
+            rocketRunning = true;
+            runRocketLoop();
         }
 
         function resetRocketGame() {
-            rocketX = 275; rocketY = 330;
-            asteroids = [{x: Math.random() * 550, y: -50, speed: 3}];
+            rocketX = 275;
+            asteroids = [
+                {x: 100, y: -50, speed: 3},
+                {x: 300, y: -150, speed: 4},
+                {x: 450, y: -250, speed: 3.5}
+            ];
             document.getElementById('try-again-container').style.display = 'none';
-            rocketGameRunning = true;
-            updateRocketGame();
+            rocketRunning = true;
+            runRocketLoop();
         }
 
-        function updateRocketGame() {
-            if (!rocketGameRunning) return;
-            if (rocketMoveLeft && rocketX > 0) rocketX -= 5;
-            if (rocketMoveRight && rocketX < 550) rocketX += 5;
+        function runRocketLoop() {
+            if (!rocketRunning) return;
+
+            if (rocketMoveLeft && rocketX > 10) rocketX -= 6;
+            if (rocketMoveRight && rocketX < 540) rocketX += 6;
 
             rocketCtx.clearRect(0, 0, 600, 400);
 
-            // Roketi çiz
-            rocketCtx.fillStyle = "#3b82f6";
-            rocketCtx.fillRect(rocketX, rocketY, 50, 40);
+            // Yıldız arkaplan efekti
+            rocketCtx.fillStyle = "#ffffff";
+            rocketCtx.fillRect(150, 50, 2, 2);
+            rocketCtx.fillRect(400, 120, 2, 2);
+            rocketCtx.fillRect(250, 300, 3, 3);
 
-            // Asteroidleri çiz ve hareket ettir
+            // Roket çizimi
+            rocketCtx.fillStyle = "#3b82f6";
+            rocketCtx.fillRect(rocketX, 330, 50, 45);
             rocketCtx.fillStyle = "#ef4444";
+            rocketCtx.beginPath();
+            rocketCtx.moveTo(rocketX, 330);
+            rocketCtx.lineTo(rocketX + 25, 300);
+            rocketCtx.lineTo(rocketX + 50, 330);
+            rocketCtx.fill();
+
+            // Asteroidler
+            rocketCtx.fillStyle = "#f97316";
             for (let i = 0; i < asteroids.length; i++) {
                 asteroids[i].y += asteroids[i].speed;
+                
                 rocketCtx.beginPath();
-                rocketCtx.arc(asteroids[i].x, asteroids[i].y, 18, 0, Math.PI * 2);
+                rocketCtx.arc(asteroids[i].x, asteroids[i].y, 20, 0, Math.PI * 2);
                 rocketCtx.fill();
 
-                // Çarpışma kontrolü
-                if (rocketX < asteroids[i].x + 18 && rocketX + 50 > asteroids[i].x - 18 &&
-                    rocketY < asteroids[i].y + 18 && rocketY + 40 > asteroids[i].y - 18) {
-                    rocketGameRunning = false;
+                // Çarpışma Tespiti (Collision)
+                if (rocketX < asteroids[i].x + 20 && rocketX + 50 > asteroids[i].x - 20 &&
+                    330 < asteroids[i].y + 20 && 375 > asteroids[i].y - 20) {
+                    rocketRunning = false;
                     document.getElementById('try-again-container').style.display = 'block';
                 }
 
-                // Ekrandan çıkan asteroidi yenile
-                if (asteroids[i].y > 420) {
-                    asteroids[i] = { x: Math.random() * 550, y: -50, speed: 3 + Math.random() * 2 };
+                // Ekran dışına çıkınca yeniden başlat
+                if (asteroids[i].y > 430) {
+                    asteroids[i].y = -50;
+                    asteroids[i].x = Math.random() * 540 + 30;
+                    asteroids[i].speed = 3 + Math.random() * 3;
                 }
             }
 
-            if (rocketGameRunning) {
-                gameInterval = requestAnimationFrame(updateRocketGame);
+            if (rocketRunning) {
+                rocketAnimId = requestAnimationFrame(runRocketLoop);
             }
         }
 
-        // --- DÖVÜŞ OYUNU MANTIĞI ---
-        let fightCanvas, fightCtx, playerX = 100, aiX = 400, playerHP = 100, aiHP = 100, fightMoveLeft = false, fightMoveRight = false;
+        // --- DÖVÜŞ OYUNU MOTORU ---
+        let fightCanvas, fightCtx, pX = 100, aiX = 420, pHP = 100, aiHP = 100, fightMoveLeft = false, fightMoveRight = false, fightAnimId;
 
         function startFightingGame() {
             document.getElementById('play-modes-view').style.display = 'none';
             document.getElementById('fighting-game-wrapper').style.display = 'flex';
             fightCanvas = document.getElementById('fightCanvas');
             fightCtx = fightCanvas.getContext('2d');
-            playerX = 100; aiX = 400; playerHP = 100; aiHP = 100;
-            updateFightGame();
+            pX = 100; aiX = 420; pHP = 100; aiHP = 100;
+            runFightLoop();
         }
 
-        function updateFightGame() {
-            if (fightMoveLeft && playerX > 0) playerX -= 4;
-            if (fightMoveRight && playerX < aiX - 40) playerX += 4;
+        function runFightLoop() {
+            if (fightMoveLeft && pX > 0) pX -= 4;
+            if (fightMoveRight && pX < aiX - 40) pX += 4;
+
+            // Yapay zeka botunun oyuncuyu takip etmesi
+            if (aiX > pX + 50) aiX -= 1.5;
+            else if (aiX < pX - 50) aiX += 1.5;
 
             fightCtx.clearRect(0, 0, 600, 400);
 
             // Zemin
-            fightCtx.fillStyle = "#334155";
-            fightCtx.fillRect(0, 350, 600, 50);
+            fightCtx.fillStyle = "#1e293b";
+            fightCtx.fillRect(0, 340, 600, 60);
 
-            // Oyuncu
+            // Oyuncu (Yeşil)
             fightCtx.fillStyle = "#22c55e";
-            fightCtx.fillRect(playerX, 300, 40, 50);
-
-            // Yapay Zeka Botu
-            fightCtx.fillStyle = "#dc2626";
-            fightCtx.fillRect(aiX, 300, 40, 50);
-
-            // Can Barları ve Skor
+            fightCtx.fillRect(pX, 280, 45, 60);
             fightCtx.fillStyle = "#ffffff";
-            fightCtx.font = "16px sans-serif";
-            fightCtx.fillText("Senin Can: " + playerHP, 20, 30);
-            fightCtx.fillText("Bot Can: " + aiHP, 450, 30);
+            fightCtx.font = "14px sans-serif";
+            fightCtx.fillText("SEN", pX + 8, 270);
 
-            requestAnimationFrame(updateFightGame);
+            // Bot (Kırmızı)
+            fightCtx.fillStyle = "#dc2626";
+            fightCtx.fillRect(aiX, 280, 45, 60);
+            fightCtx.fillText("BOT", aiX + 8, 270);
+
+            // Can Barları UI
+            fightCtx.fillStyle = "#334155";
+            fightCtx.fillRect(30, 20, 200, 20);
+            fightCtx.fillRect(370, 20, 200, 20);
+
+            fightCtx.fillStyle = "#22c55e";
+            fightCtx.fillRect(30, 20, pP * 2, 20); // pHP
+            fightCtx.fillStyle = "#dc2626";
+            fightCtx.fillRect(370, 20, aiHP * 2, 20);
+
+            fightCtx.fillStyle = "#ffffff";
+            fightCtx.fillText("Can: " + pHP, 35, 35);
+            fightCtx.fillText("Bot Can: " + aiHP, 375, 35);
+
+            fightAnimId = requestAnimationFrame(runFightLoop);
         }
 
         function fightAttackAction() {
-            // Yakınsa bota hasar ver
-            if (Math.abs(playerX - aiX) < 70) {
+            // Vurma menzili içindeyse bota hasar ver
+            if (Math.abs(pX - aiX) < 70) {
                 aiHP -= 15;
                 if (aiHP <= 0) {
                     alert("Tebrikler, dövüşü kazandın!");
                     aiHP = 100;
+                    pHP = 100;
                 }
             }
         }
+
+        // pHP helper
+        Object.defineProperty(window, 'pP', { get: function() { return Math.max(0, pHP); } });
     </script>
 </body>
 </html>
