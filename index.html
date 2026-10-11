@@ -3,134 +3,526 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Play and Learn</title>
+    <title>Play and Learn App</title>
     <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #0f172a; color: #f8fafc; text-align: center; margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background: #1e293b; padding: 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        h1 { color: #38bdf8; margin-bottom: 5px; }
-        .stats { display: flex; justify-content: space-around; background: #334155; padding: 10px; border-radius: 10px; margin: 15px 0; font-weight: bold; }
-        .coin { color: #facc15; }
-        .gem { color: #a855f7; }
-        .streak { color: #22c55e; }
-        .btn { background: #0284c7; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 8px; cursor: pointer; margin: 5px; transition: 0.2s; }
-        .btn:hover { background: #0369a1; transform: scale(1.02); }
-        .btn-game { background: #16a34a; width: 80%; font-size: 18px; padding: 15px; margin-top: 10px; }
-        .btn-game:hover { background: #15803d; }
-        .market-item { background: #334155; border: 1px solid #475569; padding: 10px; border-radius: 8px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; }
-        .tab { display: none; }
-        .active { display: block; }
-        .nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --panel-bg: #1e293b;
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+            --border-color: #334155;
+        }
+
+        body.light-mode {
+            --bg-color: #f1f5f9;
+            --text-color: #0f172a;
+            --panel-bg: #ffffff;
+            --accent-color: #2563eb;
+            --accent-hover: #1d4ed8;
+            --border-color: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Top Header Bar */
+        header {
+            background-color: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .welcome-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Sliding Market Panel */
+        #market-panel {
+            position: absolute;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            background-color: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px;
+            display: none;
+            z-index: 90;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        #market-panel.active {
+            display: block;
+        }
+
+        .market-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .market-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        /* Inventory Panel */
+        #inventory-panel {
+            position: absolute;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            background-color: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px;
+            display: none;
+            z-index: 85;
+        }
+
+        #inventory-panel.active {
+            display: block;
+        }
+
+        /* Main Container */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Verification Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .modal-card input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* Game Screens */
+        .game-container {
+            width: 100%;
+            max-width: 800px;
+            height: 450px;
+            background: #000;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            display: none;
+        }
+
+        /* Touch Controls for Mobile/iPad */
+        .touch-controls {
+            display: none;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 15px;
+            padding: 0 10px;
+        }
+
+        .touch-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .touch-btn {
+            width: 60px;
+            height: 60px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>🎮 Play and Learn 🎮</h1>
-    <p style="color: #94a3b8; font-size: 14px;">Savaş & Roket Mini Oyunları</p>
-
-    <!-- İstatistikler -->
-    <div class="stats">
-        <span class="coin">🪙 Altın: <span id="coins">0</span></span>
-        <span class="gem">💎 Elmas: <span id="gems">0</span></span>
-        <span class="streak">🔥 Seri: <span id="streak">0</span></span>
-    </div>
-
-    <!-- Menü Butonları -->
-    <div class="nav">
-        <button class="btn" onclick="showTab('games')">🕹️ Oyunlar</button>
-        <button class="btn" onclick="showTab('market')">🛒 Market</button>
-    </div>
-
-    <!-- Oyunlar Sekmesi -->
-    <div id="games" class="tab active">
-        <h3>Oyun Seç</h3>
-        <button class="btn btn-game" onclick="playGame('battle')">⚔️ Savaş Arenası</button>
-        <button class="btn btn-game" onclick="playGame('rocket')">🚀 Roket Fırlatma</button>
-    </div>
-
-    <!-- Market Sekmesi -->
-    <div id="market" class="tab">
-        <h3>Sonsuz Stoklu Market</h3>
-        <div class="market-item">
-            <span>🚀 Süper Roket Yakıtı (+10% Hız)</span>
-            <button class="btn" onclick="buyItem(50)">50 🪙</button>
-        </div>
-        <div class="market-item">
-            <span>🛡️ Savaş Kalkanı</span>
-            <button class="btn" onclick="buyItem(100)">100 🪙</button>
-        </div>
-        <div class="market-item">
-            <span>👑 VIP Efekt</span>
-            <button class="btn" onclick="buyItem(300)">300 🪙</button>
+    <!-- Account Verification / Creative Player Modal -->
+    <div id="auth-modal" class="modal-overlay">
+        <div class="modal-card">
+            <h2 id="modal-title">Hesap Seçimi</h2>
+            <p id="modal-desc" style="margin: 10px 0; font-size: 0.9rem;">Devam etmek için hesap adınızı girin:</p>
+            <input type="text" id="username-input" placeholder="Kullanıcı adı...">
+            <button class="btn" onclick="handleAccountSubmit()" style="width: 100%; margin-top: 10px;">Devam Et</button>
         </div>
     </div>
-</div>
 
-<script>
-    let state = {
-        coins: parseInt(localStorage.getItem('pal_coins')) || 0,
-        gems: parseInt(localStorage.getItem('pal_gems')) || 0,
-        streak: parseInt(localStorage.getItem('pal_streak')) || 0
-    };
+    <!-- Top Header -->
+    <header>
+        <div class="header-left">
+            <div class="welcome-title" id="welcome-display">Welcome Guest</div>
+        </div>
+        <div class="header-right">
+            <button class="btn" onclick="toggleMarket()">MARKET</button>
+            <button class="btn" onclick="toggleInventory()">ENVANTER</button>
+            <button class="btn" onclick="openSettings()">AYARLAR</button>
+        </div>
+    </header>
 
-    function updateUI() {
-        document.getElementById('coins').innerText = state.coins;
-        document.getElementById('gems').innerText = state.gems;
-        document.getElementById('streak').innerText = state.streak;
-        localStorage.setItem('pal_coins', state.coins);
-        localStorage.setItem('pal_gems', state.gems);
-        localStorage.setItem('pal_streak', state.streak);
-    }
+    <!-- Sliding Market Panel -->
+    <div id="market-panel">
+        <h3>Market (Ücretsiz Creative Eşyaları)</h3>
+        <div class="market-grid" id="market-grid-items">
+            <!-- Dinamik Market Öğeleri -->
+        </div>
+    </div>
 
-    function showTab(tabId) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-    }
+    <!-- Toggleable Inventory Panel -->
+    <div id="inventory-panel">
+        <h3>Envanterim</h3>
+        <div class="market-grid" id="inventory-grid-items">
+            <!-- Envanter Öğeleri -->
+        </div>
+    </div>
 
-    function playGame(type) {
-        // 3 Aşamalı Doğrulama / Arayüz simülasyonu
-        let step1 = confirm(type === 'battle' ? "⚔️ Savaş Arenasına girmek istiyor musun?" : "🚀 Roket platformuna geçilsin mi?");
-        if(!step1) return;
+    <!-- Main Lobby View -->
+    <main id="lobby-view">
+        <h1>Learn & Play App</h1>
+        <p style="margin: 15px 0;">Eğlenceli oyunlar ve öğrenme dünyasına hoş geldin!</p>
+        <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+            <button class="btn" onclick="openPlayMenu()" style="padding: 12px 24px; font-size: 1.1rem;">PLAY</button>
+            <button class="btn" onclick="openLearnMenu()" style="padding: 12px 24px; font-size: 1.1rem;">LEARN</button>
+        </div>
+    </main>
 
-        let step2 = confirm("Aşama 2/3: Hazırlıklar tamam mı?");
-        if(!step2) return;
+    <!-- Play Modes Selection View -->
+    <main id="play-modes-view" style="display: none;">
+        <h2>Oyun Modları</h2>
+        <div style="display: flex; gap: 15px; justify-content: center; margin-top: 25px;">
+            <button class="btn" onclick="startRocketGame()">Roket Oyunu</button>
+            <button class="btn" onclick="startFightingGame()">Dövüş Oyunu</button>
+            <button class="btn" onclick="backToLobby()" style="background-color: #64748b;">Geri</button>
+        </div>
+    </main>
 
-        let step3 = confirm("Aşama 3/3: Başlatılıyor! Hazır mısın?");
-        if(!step3) return;
+    <!-- Rocket Game Container -->
+    <div id="rocket-game-container" style="display: none; flex-direction: column; align-items: center; justify-content: center; flex: 1;">
+        <div class="game-container" id="rocket-canvas-area" style="position: relative;">
+            <div id="try-again-btn" style="display:none; position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); z-index:50;">
+                <button class="btn" onclick="resetRocketGame()" style="font-size: 1.5rem; padding: 15px 30px;">TRY AGAIN</button>
+            </div>
+            <!-- Roket ve Asteroidler JS ile yönetilir -->
+        </div>
+        <div class="touch-controls" id="rocket-touch">
+            <div class="touch-group">
+                <button class="touch-btn" ontouchstart="rocketLeft=true" ontouchend="rocketLeft=false" onmousedown="rocketLeft=true" onmouseup="rocketLeft=false">◀</button>
+                <button class="touch-btn" ontouchstart="rocketRight=true" ontouchend="rocketRight=false" onmousedown="rocketRight=true" onmouseup="rocketRight=false">▶</button>
+            </div>
+            <button class="btn" onclick="backToPlayModes()" style="background-color: #64748b;">Çıkış</button>
+        </div>
+    </div>
 
-        // Oyun Sonucu (Rastgele Kazanma)
-        let won = Math.random() > 0.4;
-        if(won) {
-            state.coins += 20;
-            state.streak += 1;
+    <!-- Fighting Game Container -->
+    <div id="fighting-game-container" style="display: none; flex-direction: column; align-items: center; justify-content: center; flex: 1;">
+        <div class="game-container" id="fight-canvas-area" style="position: relative; background: #111;">
+            <!-- Can barları ve dövüşçüler -->
+        </div>
+        <div class="touch-controls" id="fight-touch" style="display: flex;">
+            <div class="touch-group">
+                <button class="touch-btn" ontouchstart="fightLeft=true" ontouchend="fightLeft=false" onmousedown="fightLeft=true" onmouseup="fightLeft=false">◀</button>
+                <button class="touch-btn" ontouchstart="fightRight=true" ontouchend="fightRight=false" onmousedown="fightRight=true" onmouseup="fightRight=false">▶</button>
+            </div>
+            <button class="touch-btn" style="background-color: #dc2626;" onclick="fightAttack()">VUR</button>
+            <button class="btn" onclick="backToPlayModes()" style="background-color: #64748b;">Çıkış</button>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = "";
+        let isCreativePlayer = false;
+        let testStep = 0; // 0: Renk, 1: Oyun, 2: Nesne
+
+        function handleAccountSubmit() {
+            const val = document.getElementById('username-input').value.trim();
+            if(!val) return;
+            currentUser = val;
             
-            // 2 Art Arda Zafer Kuralı (Elmas Ödülü)
-            if(state.streak % 2 === 0) {
-                state.gems += 1;
-                alert("🎉 TEBRİKLER! Zafer kazandın (+20 Altın) ve 2 art arda zafer serisi yaptığın için +1 💎 ELMAS KAZANDIN!");
+            if(val.toLowerCase() === "creative player") {
+                startCreativeTest(0);
             } else {
-                alert("🎉 TEBRİKLER! Zafer kazandın (+20 Altın)!");
+                finalizeLogin(false);
             }
-        } else {
-            state.streak = 0;
-            alert("💥 Maalesef bu turu kaybettin. Serin sıfırlandı ama tekrar deneyebilirsin!");
         }
-        updateUI();
-    }
 
-    function buyItem(price) {
-        if(state.coins >= price) {
-            state.coins -= price;
-            alert("🛒 Ürün başarıyla satın alındı!");
-            updateUI();
-        } else {
-            alert("❌ Yetersiz altın!");
+        function startCreativeTest(step) {
+            testStep = step;
+            const modalTitle = document.getElementById('modal-title');
+            const modalDesc = document.getElementById('modal-desc');
+            const inputField = document.getElementById('username-input');
+            inputField.style.display = 'none';
+            
+            let html = '';
+            if(step === 0) {
+                modalTitle.innerText = "Creative Player Testi (1/3)";
+                modalDesc.innerText = "En sevdiği renk nedir?";
+                html = `
+                    <div class="options-grid">
+                        <button class="btn" onclick="checkTestAnswer(0, 'gri')">Gri</button>
+                        <button class="btn" onclick="checkTestAnswer(0, 'mavi')">Mavi</button>
+                        <button class="btn" onclick="checkTestAnswer(0, 'kirmizi')">Kırmızı</button>
+                        <button class="btn" onclick="checkTestAnswer(0, 'sari')">Sarı</button>
+                    </div>
+                `;
+            } else if(step === 1) {
+                modalTitle.innerText = "Creative Player Testi (2/3)";
+                modalDesc.innerText = "Creative player'ın en sevdiği oyun?";
+                html = `
+                    <div class="options-grid">
+                        <button class="btn" style="background:#16a34a;" onclick="checkTestAnswer(1, 'minecraft')">Minecraft</button>
+                        <button class="btn" style="background:#dc2626;" onclick="checkTestAnswer(1, 'amongus')">Among Us</button>
+                        <button class="btn" style="background:#db2777;" onclick="checkTestAnswer(1, 'roblox')">Roblox</button>
+                        <button class="btn" style="background:#ca8a04;" onclick="checkTestAnswer(1, 'fortnite')">Fortnite</button>
+                    </div>
+                `;
+            } else if(step === 2) {
+                modalTitle.innerText = "Creative Player Testi (3/3)";
+                modalDesc.innerText = "Creative player'ın en sevdiği nesne?";
+                html = `
+                    <div class="options-grid">
+                        <button class="btn" style="background:#2563eb;" onclick="checkTestAnswer(2, 'yastik')">Yastık</button>
+                        <button class="btn" style="background:#2563eb;" onclick="checkTestAnswer(2, 'yatak')">Yatak</button>
+                        <button class="btn" style="background:#2563eb;" onclick="checkTestAnswer(2, 'masa')">Masa</button>
+                        <button class="btn" style="background:#2563eb;" onclick="checkTestAnswer(2, 'sandalye')">Sandalye</button>
+                    </div>
+                `;
+            }
+            
+            // Seçenekleri modal içerisine yerleştir
+            let gridDiv = document.getElementById('test-options-container');
+            if(!gridDiv) {
+                gridDiv = document.createElement('div');
+                gridDiv.id = 'test-options-container';
+                modalDesc.after(gridDiv);
+            }
+            gridDiv.innerHTML = html;
         }
-    }
 
-    updateUI();
-</script>
+        function checkTestAnswer(step, answer) {
+            if(step === 0 && (answer === 'gri' || answer === 'mavi')) {
+                startCreativeTest(1);
+            } else if(step === 1 && (answer === 'minecraft' || answer === 'amongus')) {
+                startCreativeTest(2);
+            } else if(step === 2 && (answer === 'yastik' || answer === 'yatak')) {
+                isCreativePlayer = true;
+                finalizeLogin(true);
+            } else {
+                alert("Yanlış cevap! E-posta ve doğum tarihi doğrulaması gerekiyor.");
+                location.reload();
+            }
+        }
 
+        function finalizeLogin(creative) {
+            document.getElementById('auth-modal').style.display = 'none';
+            document.getElementById('welcome-display').innerText = creative ? `Welcome, Hoş geldin Yaratan Kişi (${currentUser})` : `Welcome, ${currentUser}`;
+            initMarket();
+        }
+
+        // Market ve Envanter Sistemleri
+        let marketItems = [
+            { id: 1, name: "Altın Roket Kaplaması", price: "ÜCRETSİZ" },
+            { id: 2, name: "Ateş Efekti", price: "ÜCRETSİZ" },
+            { id: 3, name: "Neon Kostüm", price: "ÜCRETSİZ" }
+        ];
+        let inventory = [];
+
+        function initMarket() {
+            renderMarket();
+        }
+
+        function renderMarket() {
+            const container = document.getElementById('market-grid-items');
+            container.innerHTML = '';
+            marketItems.forEach((item, index) => {
+                container.innerHTML += `
+                    <div class="market-item">
+                        <p><b>${item.name}</b></p>
+                        <p style="font-size:0.8rem; color:#3b82f6; margin:5px 0;">${item.price}</p>
+                        <button class="btn" onclick="buyItem(${index})">Al</button>
+                    </div>
+                `;
+            });
+        }
+
+        function buyItem(index) {
+            const purchased = marketItems[index];
+            inventory.push(purchased);
+            // Sonsuz market: Alınan eşyanın yerine anında rastgele yenisi gelsin
+            marketItems[index] = {
+                id: Math.random(),
+                name: "Özel Gizemli Eşya #" + Math.floor(Math.random() * 100),
+                price: "ÜCRETSİZ"
+            };
+            renderMarket();
+            renderInventory();
+            alert(purchased.name + " envanterine eklendi!");
+        }
+
+        function renderInventory() {
+            const container = document.getElementById('inventory-grid-items');
+            container.innerHTML = inventory.length === 0 ? "<p>Envanter boş</p>" : "";
+            inventory.forEach((item, idx) => {
+                container.innerHTML += `
+                    <div class="market-item">
+                        <p><b>${item.name}</b></p>
+                        <p style="font-size:0.8rem; color:#22c55e;">Kullanılıyor</p>
+                        <button class="btn" style="background:#dc2626;" onclick="removeItem(${idx})">Çıkart</button>
+                    </div>
+                `;
+            });
+        }
+
+        function removeItem(idx) {
+            inventory.splice(idx, 1);
+            renderInventory();
+        }
+
+        function toggleMarket() {
+            document.getElementById('market-panel').classList.toggle('active');
+            document.getElementById('inventory-panel').classList.remove('active');
+        }
+
+        function toggleInventory() {
+            document.getElementById('inventory-panel').classList.toggle('active');
+            document.getElementById('market-panel').classList.remove('active');
+        }
+
+        function openSettings() {
+            alert("Ayarlar menüsü aktif: Arka plan müziği ve Dondurma gücü devrede.");
+        }
+
+        function openPlayMenu() {
+            document.getElementById('lobby-view').style.display = 'none';
+            document.getElementById('play-modes-view').style.display = 'flex';
+        }
+
+        function openLearnMenu() {
+            alert("Learn seçenekleri güncellenmiyor. Lütfen learn seçenekleri güncellenince uygulamaya gelip tekrar deneyiniz.");
+        }
+
+        function backToLobby() {
+            document.getElementById('play-modes-view').style.display = 'none';
+            document.getElementById('lobby-view').style.display = 'flex';
+        }
+
+        function backToPlayModes() {
+            document.getElementById('rocket-game-container').style.display = 'none';
+            document.getElementById('fighting-game-container').style.display = 'none';
+            document.getElementById('play-modes-view').style.display = 'flex';
+        }
+
+        function startRocketGame() {
+            document.getElementById('play-modes-view').style.display = 'none';
+            document.getElementById('rocket-game-container').style.display = 'flex';
+            // Roket oyunu başlatma mantığı
+        }
+
+        function resetRocketGame() {
+            document.getElementById('try-again-btn').style.display = 'none';
+        }
+
+        function startFightingGame() {
+            document.getElementById('play-modes-view').style.display = 'none';
+            document.getElementById('fighting-game-container').style.display = 'flex';
+            // Dövüş oyunu başlatma mantığı
+        }
+
+        function fightAttack() {
+            // Dövüş vuruş mekaniği
+            alert("Vuruş gerçekleştirildi!");
+        }
+    </script>
 </body>
 </html>
