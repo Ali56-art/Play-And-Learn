@@ -14,15 +14,6 @@
             --border-color: #334155;
         }
 
-        body.light-mode {
-            --bg-color: #f1f5f9;
-            --text-color: #0f172a;
-            --panel-bg: #ffffff;
-            --accent-color: #2563eb;
-            --accent-hover: #1d4ed8;
-            --border-color: #cbd5e1;
-        }
-
         * {
             box-sizing: border-box;
             margin: 0;
@@ -38,14 +29,13 @@
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
-            transition: background 0.3s, color 0.3s;
         }
 
-        /* Top Header Bar */
+        /* Üst Header Bar */
         header {
             background-color: var(--panel-bg);
             border-bottom: 1px solid var(--border-color);
-            padding: 10px 20px;
+            padding: 12px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -85,7 +75,7 @@
             background-color: var(--accent-hover);
         }
 
-        /* Sliding Market Panel */
+        /* Market Paneli (Yukarıdan İnen) */
         #market-panel {
             position: absolute;
             top: 60px;
@@ -96,7 +86,7 @@
             padding: 20px;
             display: none;
             z-index: 90;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
         }
 
         #market-panel.active {
@@ -118,7 +108,7 @@
             text-align: center;
         }
 
-        /* Inventory Panel */
+        /* Envanter Paneli (Marketin Altında) */
         #inventory-panel {
             position: absolute;
             top: 60px;
@@ -135,7 +125,7 @@
             display: block;
         }
 
-        /* Main Container */
+        /* Ana Alan */
         main {
             flex: 1;
             display: flex;
@@ -146,14 +136,14 @@
             text-align: center;
         }
 
-        /* Verification Modal Overlay */
+        /* Hesap Doğrulama / Test Modalı */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -166,7 +156,7 @@
             padding: 30px;
             border-radius: 12px;
             width: 90%;
-            max-width: 400px;
+            max-width: 420px;
             text-align: center;
         }
 
@@ -187,7 +177,7 @@
             margin-top: 15px;
         }
 
-        /* Game Screens */
+        /* Oyun Konteynerleri */
         .game-container {
             width: 100%;
             max-width: 800px;
@@ -200,7 +190,6 @@
             display: none;
         }
 
-        /* Touch Controls for Mobile/iPad */
         .touch-controls {
             display: none;
             justify-content: space-between;
@@ -230,17 +219,17 @@
 </head>
 <body>
 
-    <!-- Account Verification / Creative Player Modal -->
+    <!-- Hesap Doğrulama / Creative Player Test Modalı -->
     <div id="auth-modal" class="modal-overlay">
         <div class="modal-card">
             <h2 id="modal-title">Hesap Seçimi</h2>
-            <p id="modal-desc" style="margin: 10px 0; font-size: 0.9rem;">Devam etmek için hesap adınızı girin:</p>
-            <input type="text" id="username-input" placeholder="Kullanıcı adı...">
+            <p id="modal-desc" style="margin: 10px 0; font-size: 0.9rem;">Değiştirmek için hesap adınızı girin:</p>
+            <input type="text" id="username-input" placeholder="Kullanıcı adı (örn: creative player)...">
             <button class="btn" onclick="handleAccountSubmit()" style="width: 100%; margin-top: 10px;">Devam Et</button>
         </div>
     </div>
 
-    <!-- Top Header -->
+    <!-- Üst Header -->
     <header>
         <div class="header-left">
             <div class="welcome-title" id="welcome-display">Welcome Guest</div>
@@ -252,68 +241,66 @@
         </div>
     </header>
 
-    <!-- Sliding Market Panel -->
+    <!-- Kayan Market Paneli -->
     <div id="market-panel">
         <h3>Market (Ücretsiz Creative Eşyaları)</h3>
-        <div class="market-grid" id="market-grid-items">
-            <!-- Dinamik Market Öğeleri -->
-        </div>
+        <div class="market-grid" id="market-grid-items"></div>
     </div>
 
-    <!-- Toggleable Inventory Panel -->
+    <!-- Açılır Envanter Paneli -->
     <div id="inventory-panel">
         <h3>Envanterim</h3>
-        <div class="market-grid" id="inventory-grid-items">
-            <!-- Envanter Öğeleri -->
-        </div>
+        <div class="market-grid" id="inventory-grid-items"></div>
     </div>
 
-    <!-- Main Lobby View -->
+    <!-- Ana Lobi Görünümü -->
     <main id="lobby-view">
-        <h1>Learn & Play App</h1>
-        <p style="margin: 15px 0;">Eğlenceli oyunlar ve öğrenme dünyasına hoş geldin!</p>
+        <h1 id="main-heading">Welcome to the learn and play and learn app</h1>
+        <p style="margin: 15px 0; color: #94a3b8;">Parti oluştur, arkadaşlarınla oyna veya yapay zekaya meydan oku!</p>
         <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
-            <button class="btn" onclick="openPlayMenu()" style="padding: 12px 24px; font-size: 1.1rem;">PLAY</button>
-            <button class="btn" onclick="openLearnMenu()" style="padding: 12px 24px; font-size: 1.1rem;">LEARN</button>
+            <button class="btn" onclick="openPlayMenu()" style="padding: 12px 30px; font-size: 1.2rem;">PLAY</button>
+            <button class="btn" onclick="openLearnMenu()" style="padding: 12px 30px; font-size: 1.2rem;">LEARN</button>
         </div>
     </main>
 
-    <!-- Play Modes Selection View -->
+    <!-- Oyun Seçim Ekranı -->
     <main id="play-modes-view" style="display: none;">
-        <h2>Oyun Modları</h2>
+        <h2>Oyun Modunu Seç</h2>
         <div style="display: flex; gap: 15px; justify-content: center; margin-top: 25px;">
-            <button class="btn" onclick="startRocketGame()">Roket Oyunu</button>
-            <button class="btn" onclick="startFightingGame()">Dövüş Oyunu</button>
-            <button class="btn" onclick="backToLobby()" style="background-color: #64748b;">Geri</button>
+            <button class="btn" onclick="startRocketGame()" style="padding: 12px 24px;">Roket Oyunu</button>
+            <button class="btn" onclick="startFightingGame()" style="padding: 12px 24px;">Dövüş Oyunu</button>
+            <button class="btn" onclick="backToLobby()" style="background-color: #64748b; padding: 12px 24px;">Geri</button>
         </div>
     </main>
 
-    <!-- Rocket Game Container -->
+    <!-- Roket Oyunu Ekranı -->
     <div id="rocket-game-container" style="display: none; flex-direction: column; align-items: center; justify-content: center; flex: 1;">
         <div class="game-container" id="rocket-canvas-area" style="position: relative;">
             <div id="try-again-btn" style="display:none; position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); z-index:50;">
                 <button class="btn" onclick="resetRocketGame()" style="font-size: 1.5rem; padding: 15px 30px;">TRY AGAIN</button>
             </div>
-            <!-- Roket ve Asteroidler JS ile yönetilir -->
         </div>
-        <div class="touch-controls" id="rocket-touch">
+        <div class="touch-controls" id="rocket-touch" style="display: flex;">
             <div class="touch-group">
-                <button class="touch-btn" ontouchstart="rocketLeft=true" ontouchend="rocketLeft=false" onmousedown="rocketLeft=true" onmouseup="rocketLeft=false">◀</button>
-                <button class="touch-btn" ontouchstart="rocketRight=true" ontouchend="rocketRight=false" onmousedown="rocketRight=true" onmouseup="rocketRight=false">▶</button>
+                <button class="touch-btn" onclick="moveRocket('left')">◀</button>
+                <button class="touch-btn" onclick="moveRocket('right')">▶</button>
             </div>
             <button class="btn" onclick="backToPlayModes()" style="background-color: #64748b;">Çıkış</button>
         </div>
     </div>
 
-    <!-- Fighting Game Container -->
+    <!-- Dövüş Oyunu Ekranı -->
     <div id="fighting-game-container" style="display: none; flex-direction: column; align-items: center; justify-content: center; flex: 1;">
         <div class="game-container" id="fight-canvas-area" style="position: relative; background: #111;">
-            <!-- Can barları ve dövüşçüler -->
+            <div style="padding: 20px; color: white;">
+                <h3>Savaş Arenası (Bot Zorluğu: Orta)</h3>
+                <p>Rakip Can: 100/100 | Senin Can: 100/100</p>
+            </div>
         </div>
         <div class="touch-controls" id="fight-touch" style="display: flex;">
             <div class="touch-group">
-                <button class="touch-btn" ontouchstart="fightLeft=true" ontouchend="fightLeft=false" onmousedown="fightLeft=true" onmouseup="fightLeft=false">◀</button>
-                <button class="touch-btn" ontouchstart="fightRight=true" ontouchend="fightRight=false" onmousedown="fightRight=true" onmouseup="fightRight=false">▶</button>
+                <button class="touch-btn" onclick="fightMove('left')">◀</button>
+                <button class="touch-btn" onclick="fightMove('right')">▶</button>
             </div>
             <button class="touch-btn" style="background-color: #dc2626;" onclick="fightAttack()">VUR</button>
             <button class="btn" onclick="backToPlayModes()" style="background-color: #64748b;">Çıkış</button>
@@ -323,7 +310,7 @@
     <script>
         let currentUser = "";
         let isCreativePlayer = false;
-        let testStep = 0; // 0: Renk, 1: Oyun, 2: Nesne
+        let testStep = 0;
 
         function handleAccountSubmit() {
             const val = document.getElementById('username-input').value.trim();
@@ -347,7 +334,7 @@
             let html = '';
             if(step === 0) {
                 modalTitle.innerText = "Creative Player Testi (1/3)";
-                modalDesc.innerText = "En sevdiği renk nedir?";
+                modalDesc.innerText = "Creative player'ın en sevdiği renk ne?";
                 html = `
                     <div class="options-grid">
                         <button class="btn" onclick="checkTestAnswer(0, 'gri')">Gri</button>
@@ -380,7 +367,6 @@
                 `;
             }
             
-            // Seçenekleri modal içerisine yerleştir
             let gridDiv = document.getElementById('test-options-container');
             if(!gridDiv) {
                 gridDiv = document.createElement('div');
@@ -406,11 +392,13 @@
 
         function finalizeLogin(creative) {
             document.getElementById('auth-modal').style.display = 'none';
-            document.getElementById('welcome-display').innerText = creative ? `Welcome, Hoş geldin Yaratan Kişi (${currentUser})` : `Welcome, ${currentUser}`;
+            const welcomeText = creative ? `Welcome Yaratan Kişi (${currentUser})` : `Welcome ${currentUser}`;
+            document.getElementById('welcome-display').innerText = welcomeText;
+            document.getElementById('main-heading').innerText = `Welcome to the learn and play and learn app, ${currentUser}!`;
             initMarket();
         }
 
-        // Market ve Envanter Sistemleri
+        // Market ve Envanter
         let marketItems = [
             { id: 1, name: "Altın Roket Kaplaması", price: "ÜCRETSİZ" },
             { id: 2, name: "Ateş Efekti", price: "ÜCRETSİZ" },
@@ -439,10 +427,9 @@
         function buyItem(index) {
             const purchased = marketItems[index];
             inventory.push(purchased);
-            // Sonsuz market: Alınan eşyanın yerine anında rastgele yenisi gelsin
             marketItems[index] = {
                 id: Math.random(),
-                name: "Özel Gizemli Eşya #" + Math.floor(Math.random() * 100),
+                name: "Rastgele Eşya #" + Math.floor(Math.random() * 100),
                 price: "ÜCRETSİZ"
             };
             renderMarket();
@@ -480,7 +467,7 @@
         }
 
         function openSettings() {
-            alert("Ayarlar menüsü aktif: Arka plan müziği ve Dondurma gücü devrede.");
+            alert("Ayarlar açık: Müzik ve Dondurma Gücü devrede.");
         }
 
         function openPlayMenu() {
@@ -489,7 +476,7 @@
         }
 
         function openLearnMenu() {
-            alert("Learn seçenekleri güncellenmiyor. Lütfen learn seçenekleri güncellenince uygulamaya gelip tekrar deneyiniz.");
+            alert("Learn seçenekleri henüz güncellenmedi. Lütfen learn seçenekleri güncellenince uygulamaya gelip tekrar deneyiniz.");
         }
 
         function backToLobby() {
@@ -506,7 +493,10 @@
         function startRocketGame() {
             document.getElementById('play-modes-view').style.display = 'none';
             document.getElementById('rocket-game-container').style.display = 'flex';
-            // Roket oyunu başlatma mantığı
+        }
+
+        function moveRocket(dir) {
+            // Roket sağ sol hareket
         }
 
         function resetRocketGame() {
@@ -516,12 +506,11 @@
         function startFightingGame() {
             document.getElementById('play-modes-view').style.display = 'none';
             document.getElementById('fighting-game-container').style.display = 'flex';
-            // Dövüş oyunu başlatma mantığı
         }
 
+        function fightMove(dir) {}
         function fightAttack() {
-            // Dövüş vuruş mekaniği
-            alert("Vuruş gerçekleştirildi!");
+            alert("Vuruş yapıldı!");
         }
     </script>
 </body>
