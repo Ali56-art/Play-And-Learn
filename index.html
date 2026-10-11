@@ -13,6 +13,8 @@ body.light-mode {
         padding: 0;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
     }
 
     body {
@@ -49,11 +51,12 @@ body.light-mode {
         background-color: var(--accent-color);
         color: white;
         border: none;
-        padding: 8px 14px;
+        padding: 10px 16px;
         border-radius: 6px;
         cursor: pointer;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         transition: background 0.2s, transform 0.1s;
+        touch-action: manipulation;
     }
 
     .btn:hover {
@@ -190,7 +193,7 @@ body.light-mode {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0,0,0,0.8);
+        background: rgba(0,0,0,0.85);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -208,15 +211,17 @@ body.light-mode {
         display: flex;
         flex-direction: column;
         gap: 15px;
+        z-index: 205;
     }
 
     .modal-content input, .modal-content select {
         width: 100%;
-        padding: 10px;
+        padding: 12px;
         border-radius: 6px;
         border: 1px solid var(--border-color);
         background: var(--bg-color);
         color: var(--text-color);
+        font-size: 1rem;
     }
 
     .options-grid {
@@ -226,12 +231,14 @@ body.light-mode {
     }
 
     .option-btn {
-        padding: 12px;
+        padding: 14px;
         border: none;
         border-radius: 6px;
         cursor: pointer;
         font-weight: bold;
         color: white;
+        font-size: 1rem;
+        touch-action: manipulation;
     }
 
     #game-container {
@@ -261,9 +268,9 @@ body.light-mode {
     }
 
     .control-btn {
-        width: 60px;
-        height: 60px;
-        font-size: 1.2rem;
+        width: 65px;
+        height: 65px;
+        font-size: 1.3rem;
         background: var(--accent-color);
         color: white;
         border: none;
@@ -272,6 +279,7 @@ body.light-mode {
         display: flex;
         justify-content: center;
         align-items: center;
+        touch-action: manipulation;
     }
 
     .hidden {
@@ -330,8 +338,8 @@ body.light-mode {
     <div class="modal-content">
         <h3>Hesap Seçimi</h3>
         <p>Devam etmek için hesap adını girin (Örn: creative player)</p>
-        <input type="text" id="username-input" placeholder="Kullanıcı adı...">
-        <button class="btn" onclick="submitUsername()">Devam Et</button>
+        <input type="text" id="username-input" placeholder="Kullanıcı adı..." autocomplete="off">
+        <button class="btn" id="submit-user-btn">Devam Et</button>
     </div>
 </div>
 
@@ -572,6 +580,16 @@ body.light-mode {
     window.onload = function() {
         generateRandomMarketItems();
         startLobbyMusic();
+
+        // Robust event listener for mobile & desktop touch/clicks on "Devam Et"
+        const submitBtn = document.getElementById('submit-user-btn');
+        if(submitBtn) {
+            submitBtn.addEventListener('click', submitUsername);
+            submitBtn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                submitUsername();
+            });
+        }
     };
 
     function submitUsername() {
@@ -807,12 +825,12 @@ body.light-mode {
         let attackBtn = document.getElementById('t-attack');
 
         leftBtn.onclick = () => { pX = Math.max(0, pX - 15); let ply = document.getElementById('player'); if(ply) ply.style.left = pX + 'px'; };
-        rightBtn.onclick = () => { pX = Math.min(250, pX + 15); let ply = document.getElementById('player'); if(ply) ply.style.left = pX + 'px'; };
+        rightBtn.onclick = () => { pX = Math.min(250, pX + 15); let ply = document.getElementById('player'); if(ply) ply.style.left = ply.style.left = pX + 'px'; };
         attackBtn.onclick = () => {
             if(Math.abs(pX - bX) < 80) {
                 bHP = Math.max(0, bHP - 15);
                 let bhpElem = document.getElementById('b-hp');
-                if(bhpElem) bhpElem.innerText = bHP;
+                if(bhpElem) bhpElem.innerText = bhpElem.innerText = bHP;
                 if(bHP === 0) alert('Kazandın!');
             }
         };
