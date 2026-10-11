@@ -5,19 +5,132 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Play and Learn</title>
     <style>
-        body { font-family: sans-serif; background: #1a1a2e; color: white; text-align: center; margin: 0; padding: 20px; }
-        .card { background: #16213e; padding: 20px; border-radius: 12px; max-width: 500px; margin: 20px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        button { background: #0F3460; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 8px; cursor: pointer; margin: 5px; }
-        button:hover { background: #e94560; }
-        .free-tag { color: #00ff88; font-weight: bold; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #0f172a; color: #f8fafc; text-align: center; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: #1e293b; padding: 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        h1 { color: #38bdf8; margin-bottom: 5px; }
+        .stats { display: flex; justify-content: space-around; background: #334155; padding: 10px; border-radius: 10px; margin: 15px 0; font-weight: bold; }
+        .coin { color: #facc15; }
+        .gem { color: #a855f7; }
+        .streak { color: #22c55e; }
+        .btn { background: #0284c7; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 8px; cursor: pointer; margin: 5px; transition: 0.2s; }
+        .btn:hover { background: #0369a1; transform: scale(1.02); }
+        .btn-game { background: #16a34a; width: 80%; font-size: 18px; padding: 15px; margin-top: 10px; }
+        .btn-game:hover { background: #15803d; }
+        .market-item { background: #334155; border: 1px solid #475569; padding: 10px; border-radius: 8px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; }
+        .tab { display: none; }
+        .active { display: block; }
+        .nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
+
+<div class="container">
     <h1>🎮 Play and Learn 🎮</h1>
-    <div class="card">
-        <h2>Hoş Geldiniz!</h2>
-        <p>Oyun alanı hazır. Verileriniz cihazınızda saklanır (localStorage).</p>
-        <p>Durum: <span class="free-tag">ÜCRETSİZ & DOĞRULANDI</span></p>
+    <p style="color: #94a3b8; font-size: 14px;">Savaş & Roket Mini Oyunları</p>
+
+    <!-- İstatistikler -->
+    <div class="stats">
+        <span class="coin">🪙 Altın: <span id="coins">0</span></span>
+        <span class="gem">💎 Elmas: <span id="gems">0</span></span>
+        <span class="streak">🔥 Seri: <span id="streak">0</span></span>
     </div>
+
+    <!-- Menü Butonları -->
+    <div class="nav">
+        <button class="btn" onclick="showTab('games')">🕹️ Oyunlar</button>
+        <button class="btn" onclick="showTab('market')">🛒 Market</button>
+    </div>
+
+    <!-- Oyunlar Sekmesi -->
+    <div id="games" class="tab active">
+        <h3>Oyun Seç</h3>
+        <button class="btn btn-game" onclick="playGame('battle')">⚔️ Savaş Arenası</button>
+        <button class="btn btn-game" onclick="playGame('rocket')">🚀 Roket Fırlatma</button>
+    </div>
+
+    <!-- Market Sekmesi -->
+    <div id="market" class="tab">
+        <h3>Sonsuz Stoklu Market</h3>
+        <div class="market-item">
+            <span>🚀 Süper Roket Yakıtı (+10% Hız)</span>
+            <button class="btn" onclick="buyItem(50)">50 🪙</button>
+        </div>
+        <div class="market-item">
+            <span>🛡️ Savaş Kalkanı</span>
+            <button class="btn" onclick="buyItem(100)">100 🪙</button>
+        </div>
+        <div class="market-item">
+            <span>👑 VIP Efekt</span>
+            <button class="btn" onclick="buyItem(300)">300 🪙</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let state = {
+        coins: parseInt(localStorage.getItem('pal_coins')) || 0,
+        gems: parseInt(localStorage.getItem('pal_gems')) || 0,
+        streak: parseInt(localStorage.getItem('pal_streak')) || 0
+    };
+
+    function updateUI() {
+        document.getElementById('coins').innerText = state.coins;
+        document.getElementById('gems').innerText = state.gems;
+        document.getElementById('streak').innerText = state.streak;
+        localStorage.setItem('pal_coins', state.coins);
+        localStorage.setItem('pal_gems', state.gems);
+        localStorage.setItem('pal_streak', state.streak);
+    }
+
+    function showTab(tabId) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    function playGame(type) {
+        // 3 Aşamalı Doğrulama / Arayüz simülasyonu
+        let step1 = confirm(type === 'battle' ? "⚔️ Savaş Arenasına girmek istiyor musun?" : "🚀 Roket platformuna geçilsin mi?");
+        if(!step1) return;
+
+        let step2 = confirm("Aşama 2/3: Hazırlıklar tamam mı?");
+        if(!step2) return;
+
+        let step3 = confirm("Aşama 3/3: Başlatılıyor! Hazır mısın?");
+        if(!step3) return;
+
+        // Oyun Sonucu (Rastgele Kazanma)
+        let won = Math.random() > 0.4;
+        if(won) {
+            state.coins += 20;
+            state.streak += 1;
+            
+            // 2 Art Arda Zafer Kuralı (Elmas Ödülü)
+            if(state.streak % 2 === 0) {
+                state.gems += 1;
+                alert("🎉 TEBRİKLER! Zafer kazandın (+20 Altın) ve 2 art arda zafer serisi yaptığın için +1 💎 ELMAS KAZANDIN!");
+            } else {
+                alert("🎉 TEBRİKLER! Zafer kazandın (+20 Altın)!");
+            }
+        } else {
+            state.streak = 0;
+            alert("💥 Maalesef bu turu kaybettin. Serin sıfırlandı ama tekrar deneyebilirsin!");
+        }
+        updateUI();
+    }
+
+    function buyItem(price) {
+        if(state.coins >= price) {
+            state.coins -= price;
+            alert("🛒 Ürün başarıyla satın alındı!");
+            updateUI();
+        } else {
+            alert("❌ Yetersiz altın!");
+        }
+    }
+
+    updateUI();
+</script>
+
 </body>
 </html>
