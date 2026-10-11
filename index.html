@@ -25,7 +25,6 @@ body.light-mode {
         transition: background 0.3s, color 0.3s;
     }
 
-    /* Top Bar */
     header {
         display: flex;
         justify-content: space-between;
@@ -65,7 +64,6 @@ body.light-mode {
         transform: scale(0.95);
     }
 
-    /* Main Container */
     main {
         flex: 1;
         display: flex;
@@ -75,7 +73,6 @@ body.light-mode {
         position: relative;
     }
 
-    /* Welcome Banners */
     .welcome-container {
         text-align: center;
         margin-bottom: 20px;
@@ -91,7 +88,6 @@ body.light-mode {
         opacity: 0.8;
     }
 
-    /* Market Overlay (Sliding Down) */
     #market-panel {
         position: absolute;
         top: 0;
@@ -140,7 +136,6 @@ body.light-mode {
         font-size: 0.85rem;
     }
 
-    /* Inventory Panel */
     #inventory-panel {
         width: 100%;
         max-width: 600px;
@@ -172,7 +167,6 @@ body.light-mode {
         font-size: 0.8rem;
     }
 
-    /* Main Menu / Dashboard */
     .dashboard {
         display: flex;
         flex-direction: column;
@@ -190,7 +184,6 @@ body.light-mode {
         border-radius: 8px;
     }
 
-    /* Modals / Overlays */
     .modal-overlay {
         position: fixed;
         top: 0;
@@ -241,7 +234,6 @@ body.light-mode {
         color: white;
     }
 
-    /* Game Containers */
     #game-container {
         width: 100%;
         max-width: 600px;
@@ -286,7 +278,6 @@ body.light-mode {
         display: none !important;
     }
 </style>
-<!-- Header -->
 <header>
     <div class="header-title" id="app-title">Welcome, Guest</div>
     <div class="header-btns">
@@ -296,26 +287,20 @@ body.light-mode {
     </div>
 </header>
 
-<!-- Main Content -->
 <main>
-    <!-- Sliding Market Panel -->
     <div id="market-panel">
         <div class="market-header">
             <h3>Sonsuz Market</h3>
             <button class="btn" onclick="toggleMarket()">Kapat</button>
         </div>
-        <div class="market-grid" id="market-items-grid">
-            <!-- Dynamically populated items -->
-        </div>
+        <div class="market-grid" id="market-items-grid"></div>
     </div>
 
-    <!-- Welcome Banner -->
     <div class="welcome-container">
         <h1 class="welcome-title" id="welcome-header">Welcome Guest</h1>
         <p class="welcome-subtitle">Welcome to the Learn and Play App</p>
     </div>
 
-    <!-- Toggleable Inventory Panel -->
     <div id="inventory-panel">
         <h3>Envanter</h3>
         <div class="inventory-grid" id="inventory-grid-content">
@@ -323,18 +308,13 @@ body.light-mode {
         </div>
     </div>
 
-    <!-- Dashboard Menu -->
     <div class="dashboard" id="main-dashboard">
         <button class="btn menu-btn" onclick="handleStartBtn()">Start</button>
         <button class="btn menu-btn" onclick="openFriendsMenu()">Arkadaşlar & Parti</button>
     </div>
 
-    <!-- Game Canvas / Arena -->
-    <div id="game-container">
-        <!-- In-game elements injected via JS -->
-    </div>
+    <div id="game-container"></div>
 
-    <!-- Touch Controls for iPad/Mobile -->
     <div class="touch-controls" id="touch-controls-bar">
         <div class="touch-group">
             <button class="control-btn" id="t-left">◀</button>
@@ -346,7 +326,6 @@ body.light-mode {
     </div>
 </main>
 
-<!-- Account / Verification Modal -->
 <div class="modal-overlay" id="account-modal">
     <div class="modal-content">
         <h3>Hesap Seçimi</h3>
@@ -356,14 +335,10 @@ body.light-mode {
     </div>
 </div>
 
-<!-- Multi-stage Tests Modal -->
 <div class="modal-overlay hidden" id="test-modal">
-    <div class="modal-content" id="test-content">
-        <!-- Dynamic Test Content -->
-    </div>
+    <div class="modal-content" id="test-content"></div>
 </div>
 
-<!-- Learn Options Modal -->
 <div class="modal-overlay hidden" id="learn-modal">
     <div class="modal-content">
         <h3>Learn Seçenekleri</h3>
@@ -372,7 +347,6 @@ body.light-mode {
     </div>
 </div>
 
-<!-- Play Options Modal -->
 <div class="modal-overlay hidden" id="play-modal">
     <div class="modal-content">
         <h3>Oyun Modu Seçin</h3>
@@ -382,7 +356,6 @@ body.light-mode {
     </div>
 </div>
 
-<!-- Settings Modal -->
 <div class="modal-overlay hidden" id="settings-modal">
     <div class="modal-content">
         <h3>Ayarlar</h3>
@@ -411,7 +384,6 @@ body.light-mode {
     </div>
 </div>
 
-<!-- Friends & Party Modal -->
 <div class="modal-overlay hidden" id="friends-modal">
     <div class="modal-content">
         <h3>Arkadaşlar & Parti</h3>
@@ -423,16 +395,12 @@ body.light-mode {
 </div>
 
 <script>
-    // State management
     let currentUser = "";
     let isCreativePlayer = false;
     let inventory = [];
-    let coins = 100;
-    let gems = 10;
     let activeMarketItems = [];
     let gameInterval = null;
 
-    // Audio Engine (Web Audio API Synthesizer for Lobby, Fight, Rocket)
     let audioCtx = null;
     let isMusicPlaying = false;
     let musicInterval = null;
@@ -462,7 +430,7 @@ body.light-mode {
     function startLobbyMusic() {
         stopMusic();
         isMusicPlaying = true;
-        const notes = [261.63, 329.63, 392.00, 523.25]; // C, E, G, C
+        const notes = [261.63, 329.63, 392.00, 523.25];
         let i = 0;
         musicInterval = setInterval(() => {
             if (!isMusicPlaying) return;
@@ -510,7 +478,6 @@ body.light-mode {
         }
     }
 
-    // Market & Random Restocking
     const possibleItems = [
         { name: "Neon Kostüm", type: "Kostüm" },
         { name: "Altın Roket", type: "Roket Kaplaması" },
@@ -549,7 +516,6 @@ body.light-mode {
         let purchased = activeMarketItems[index];
         inventory.push(purchased.name);
         renderInventory();
-        // Replace with a new random item instantly
         let newItem = possibleItems[Math.floor(Math.random() * possibleItems.length)];
         activeMarketItems[index] = { ...newItem, id: Math.random() };
         renderMarket();
@@ -575,7 +541,6 @@ body.light-mode {
         renderInventory();
     }
 
-    // Toggles
     function toggleMarket() {
         document.getElementById('market-panel').classList.toggle('open');
     }
@@ -604,7 +569,6 @@ body.light-mode {
         document.getElementById('friends-modal').classList.add('hidden');
     }
 
-    // Username & Verification Flow
     window.onload = function() {
         generateRandomMarketItems();
         startLobbyMusic();
@@ -616,14 +580,13 @@ body.light-mode {
         currentUser = val;
         document.getElementById('account-modal').classList.add('hidden');
 
-        if(val.toLowerCase() === 'creative player') {
+        if(val.toLowerCase() === 'creative player' || val.toLowerCase() === 'at') {
             startColorTest();
         } else {
             triggerFallbackRegistration();
         }
     }
 
-    // Creative Player 3-Stage Test
     function startColorTest() {
         let modal = document.getElementById('test-modal');
         let content = document.getElementById('test-content');
@@ -718,7 +681,6 @@ body.light-mode {
         }
     }
 
-    // Start button logic
     function handleStartBtn() {
         document.getElementById('play-modal').classList.remove('hidden');
     }
@@ -731,7 +693,6 @@ body.light-mode {
         document.getElementById('learn-modal').classList.add('hidden');
     }
 
-    // Rocket Game (Left/Right only + Collision Try Again)
     function startRocketGame() {
         closePlayModal();
         startRocketMusic();
@@ -749,19 +710,18 @@ body.light-mode {
             if(isGameOver) return;
             if(e.key === 'ArrowLeft' || e.key === 'a') rocketX = Math.max(0, rocketX - 20);
             if(e.key === 'ArrowRight' || e.key === 'd') rocketX = Math.min(560, rocketX + 20);
-            document.getElementById('rocket').style.left = rocketX + 'px';
+            let rkt = document.getElementById('rocket');
+            if(rkt) rkt.style.left = rocketX + 'px';
         };
 
-        // Touch bindings for rocket
-        document.getElementById('t-left').onclick = () => { if(!isGameOver) { rocketX = Math.max(0, rocketX - 25); document.getElementById('rocket').style.left = rocketX + 'px'; } };
-        document.getElementById('t-right').onclick = () => { if(!isGameOver) { rocketX = Math.min(560, rocketX + 25); document.getElementById('rocket').style.left = rocketX + 'px'; } };
-        document.getElementById('t-attack').onclick = () => {}; // No attack in rocket
+        document.getElementById('t-left').onclick = () => { if(!isGameOver) { rocketX = Math.max(0, rocketX - 25); let rkt = document.getElementById('rocket'); if(rkt) rkt.style.left = rocketX + 'px'; } };
+        document.getElementById('t-right').onclick = () => { if(!isGameOver) { rocketX = Math.min(560, rocketX + 25); let rkt = document.getElementById('rocket'); if(rkt) rkt.style.left = rocketX + 'px'; } };
+        document.getElementById('t-attack').onclick = () => {};
 
         gameInterval = setInterval(() => {
             if(isGameOver) return;
             asteroidY += 5;
             if(asteroidY > 340) {
-                // Check collision
                 if(Math.abs(rocketX - asteroidX) < 40) {
                     isGameOver = true;
                     showTryAgainButton();
@@ -802,7 +762,6 @@ body.light-mode {
         container.appendChild(btn);
     }
 
-    // Fight Game (Separated controls, AI difficulty, HP damage)
     function startFightGame() {
         closePlayModal();
         startFightMusic();
@@ -821,29 +780,30 @@ body.light-mode {
 
         let pX = 100;
         let bX = 460;
-        let pHP = 100;
         let bHP = 100;
 
         window.onkeydown = function(e) {
             if(e.key === 'a' || e.key === 'ArrowLeft') pX = Math.max(0, pX - 15);
             if(e.key === 'd' || e.key === 'ArrowRight') pX = Math.min(250, pX + 15);
             if(e.key === ' ' || e.key === 'j') {
-                // Attack
                 if(Math.abs(pX - bX) < 80) {
                     bHP = Math.max(0, bHP - 15);
-                    document.getElementById('b-hp').innerText = bHP;
+                    let bhpElem = document.getElementById('b-hp');
+                    if(bhpElem) bhpElem.innerText = bHP;
                     if(bHP === 0) alert('Kazandın!');
                 }
             }
-            document.getElementById('player').style.left = pX + 'px';
+            let ply = document.getElementById('player');
+            if(ply) ply.style.left = pX + 'px';
         };
 
-        document.getElementById('t-left').onclick = () => { pX = Math.max(0, pX - 15); document.getElementById('player').style.left = pX + 'px'; };
-        document.getElementById('t-right').onclick = () => { pX = Math.min(250, pX + 15); document.getElementById('player').style.left = pX + 'px'; };
+        document.getElementById('t-left').onclick = () => { pX = Math.max(0, pX - 15); let ply = document.getElementById('player'); if(ply) ply.style.left = pX + 'px'; };
+        document.getElementById('t-right').onclick = () => { pX = Math.min(250, pX + 15); let ply = document.getElementById('player'); if(ply) ply.style.left = pX + 'px'; };
         document.getElementById('t-attack').onclick = () => {
             if(Math.abs(pX - bX) < 80) {
                 bHP = Math.max(0, bHP - 15);
-                document.getElementById('b-hp').innerText = bHP;
+                let bhpElem = document.getElementById('b-hp');
+                if(bhpElem) bhpElem.innerText = bHP;
                 if(bHP === 0) alert('Kazandın!');
             }
         };
